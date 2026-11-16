@@ -1,6 +1,6 @@
-model	fold	n_train	n_val	n_test
-tok_abmil	0	136	24	41
-tok_abmil	1	137	24	40
-tok_abmil	2	137	24	40
-tok_abmil	3	137	24	40
-tok_abmil	4	137	24	40
+model	fold	n_test	n_train	n_val
+tok_abmil	0	41	136	24
+tok_abmil	1	40	137	24
+tok_abmil	2	40	137	24
+tok_abmil	3	40	137	24
+tok_abmil	4	40	137	24

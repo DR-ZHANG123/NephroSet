@@ -350,7 +350,33 @@ class TokenNet(nn.Module):
         return self.heads(self.body(torch.cat(parts, -1)))
 
 
+class TokPredNet(nn.Module):
+    """Same-encoder analogue of super-resolution heads such as iStar: every 8 um token predicts the
+    programmes from its own features and position, and the spot estimate is the mean of the
+    predictions over its tissue tokens (no spot embedding, no pooling of features)."""
+
+    def __init__(self, d_in, d=256, p=0.2, dt=128, **_):
+        super().__init__()
+        self.tstem = nn.Sequential(nn.LayerNorm(D_TOK + 2), nn.Linear(D_TOK + 2, d), nn.GELU(), nn.Dropout(p))
+        self.body = nn.Sequential(nn.Linear(d, d), nn.GELU(), nn.Dropout(p), nn.Linear(d, d), nn.GELU())
+        self.heads = Heads(d)
+
+    def forward(self, g):
+        dev = g["x"].device
+        n = g["x"].shape[0]
+        tok, w = g["tok"].to(dev, non_blocking=True).float(), g["tmask"].to(dev, non_blocking=True)
+        nt = tok.shape[0] // n
+        t = self.body(self.tstem(torch.cat([tok, g["tpos"].repeat(n, 1)], -1)))
+        y, lc = self.heads(t)
+        w = w.view(n, nt, 1)
+        den = w.sum(1).clamp(min=1)
+        ys = (y.view(n, nt, -1) * w).sum(1) / den
+        cs = (lc.exp().view(n, nt, -1) * w).sum(1) / den
+        return ys, torch.log(cs.clamp(min=1e-8))
+
+
 TOKEN_REGISTRY = {
+    "tok_pred_mean": (TokPredNet, {}),
     "tok_mean": (TokenNet, {"mode": "mean"}),
     "tok_abmil": (TokenNet, {"mode": "abmil"}),
     "tok_gat": (TokenNet, {"mode": "gat"}),

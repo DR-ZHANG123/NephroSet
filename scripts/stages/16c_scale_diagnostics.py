@@ -58,10 +58,10 @@ def main() -> None:
     # token roles, held-out participants
     data = D.load_cohort(p(cfg["paths"]["interim"]) / "kpmp_spots", p(cfg["paths"]["cache"]) / "img_kpmp",
                          sections.section)
-    tok = m14b.load_tokens(sections.section)
     dev = T["device"]
     rr = []
     for fi, (tr_all, te) in enumerate(D.participant_folds(sections, T["n_folds"], cfg["seed"])):
+        tok = m14b.load_tokens(sections.section, fold=fi)
         comp = {s: torch.as_tensor(data[s]["table"][D.COMP].values, dtype=torch.float32, device=dev) for s in tr_all}
         head = TK.train_role_head([tok[s][0] for s in tr_all], [tok[s][1] for s in tr_all],
                                   [comp[s] for s in tr_all], dev, seed=cfg["seed"] + fi)

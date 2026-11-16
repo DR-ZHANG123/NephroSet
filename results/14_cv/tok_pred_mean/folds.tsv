@@ -1,0 +1,6 @@
+model	fold	n_test	n_train	n_val
+tok_pred_mean	0	41	136	24
+tok_pred_mean	1	40	137	24
+tok_pred_mean	2	40	137	24
+tok_pred_mean	3	40	137	24
+tok_pred_mean	4	40	137	24

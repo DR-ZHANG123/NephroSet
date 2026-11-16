@@ -29,7 +29,8 @@ def programme_scores(ad: sc.AnnData, programmes: dict, ctrl_size: int, seed: int
     return pd.DataFrame(out, index=ad.obs_names)
 
 
-def composition(ad: sc.AnnData, profiles: pd.DataFrame, markers: pd.DataFrame, n_iter: int = 3) -> pd.DataFrame:
+def composition(ad: sc.AnnData, profiles: pd.DataFrame, markers: pd.DataFrame, n_iter: int = 3,
+                classes: list | None = None) -> pd.DataFrame:
     """Non-negative least squares on marker genes with a per-gene platform factor.
 
     Reference profiles come from single-nucleus data; the capture efficiency of each gene on
@@ -37,10 +38,11 @@ def composition(ad: sc.AnnData, profiles: pd.DataFrame, markers: pd.DataFrame, n
     section by comparing observed with fitted marker totals, and the fit is repeated.
     Each marker gene is scaled to equal weight. Returns class fractions per spot.
     """
+    classes = CLASSES if classes is None else classes
     mk = markers.drop_duplicates("gene")
     mk = mk[mk.gene.isin(ad.var_names) & mk.gene.isin(profiles.index)]
     genes, cls_of = list(mk.gene), mk.cls.reset_index(drop=True)
-    R0 = profiles.loc[genes, CLASSES].values.astype(float)
+    R0 = profiles.loc[genes, classes].values.astype(float)
     X = ad[:, genes].layers["counts"]
     X = np.asarray(X.todense()) if hasattr(X, "todense") else np.asarray(X)
     X = X / np.maximum(np.asarray(ad.layers["counts"].sum(1)).ravel()[:, None], 1) * 1e4
@@ -58,4 +60,4 @@ def composition(ad: sc.AnnData, profiles: pd.DataFrame, markers: pd.DataFrame, n
             m = (cls_of == c).values
             gamma[m] = gamma[m] / np.median(gamma[m])
     frac = W / np.maximum(W.sum(1, keepdims=True), 1e-9)
-    return pd.DataFrame(frac, index=ad.obs_names, columns=[f"comp_{c}" for c in CLASSES])
+    return pd.DataFrame(frac, index=ad.obs_names, columns=[f"comp_{c}" for c in classes])

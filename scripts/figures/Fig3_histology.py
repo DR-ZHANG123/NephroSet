@@ -11,11 +11,12 @@ from figstyle import MODEL_LABEL, PAL, ROOT, W2, label, save
 
 R = ROOT / "results"
 PROG_LAB = {"pt_injury": "PT injury", "inflammation": "Inflammation", "pt_transport": "PT transport"}
-SHOW = ["gbm_measured_comp", "gbm_comp_morph", "hist2st", "bleep", "istar", "ridge_image", "mlp", "deepsets",
-        "tok_abmil_ctx"]
+SHOW = ["gbm_measured_comp", "gbm_comp_morph", "hist2st", "bleep", "istar", "knn_encoder", "tok_pred_mean",
+        "ridge_image", "mlp", "deepsets", "tok_abmil_ctx"]
 COL = {"gbm_measured_comp": PAL["composition"], "gbm_comp_morph": "#b07aa1", "ridge_image": PAL["image"],
        "mlp": PAL["pairwise"], "deepsets": PAL["group"], "tok_abmil_ctx": PAL["anatomy"],
-       "hist2st": "#AA4499", "bleep": "#882255", "istar": "#CC79A7"}
+       "hist2st": "#AA4499", "bleep": "#882255", "istar": "#CC79A7", "knn_encoder": "#999933",
+       "tok_pred_mean": "#44AA99"}
 CAT = {"Diabetic Kidney Disease": "DKD", "Hypertensive Kidney Disease": "HKD", "Healthy Reference": "Reference",
        "Acute Tubular Injury": "ATI"}
 
@@ -97,7 +98,7 @@ def main() -> None:
     ax.set_title("Spot level", pad=3)
     ax.set_ylim(0, 0.9)
     hl = [Line2D([], [], marker="o", ls="", ms=3, color=COL[m], label=MODEL_LABEL[m]) for m in SHOW]
-    hl.append(Line2D([], [], ls=(0, (2, 1.5)), color="0.3", lw=0.8, label="Reliability ceiling"))
+    hl.append(Line2D([], [], ls=(0, (2, 1.5)), color="0.3", lw=0.8, label="Split-half reliability reference"))
     label(ax, "b")
     ax = fig.add_subplot(bot[1])
     r2 = dots(ax, summ, "rho_beyond_comp", None, "Spearman ρ after removing\nmeasured composition")

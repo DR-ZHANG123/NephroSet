@@ -1,6 +1,6 @@
-model	fold	n_train	n_val	n_test
-tok_hyper_rewired	0	136	24	41
-tok_hyper_rewired	1	137	24	40
-tok_hyper_rewired	2	137	24	40
-tok_hyper_rewired	3	137	24	40
-tok_hyper_rewired	4	137	24	40
+model	fold	n_test	n_train	n_val
+tok_hyper_rewired	0	41	136	24
+tok_hyper_rewired	1	40	137	24
+tok_hyper_rewired	2	40	137	24
+tok_hyper_rewired	3	40	137	24
+tok_hyper_rewired	4	40	137	24

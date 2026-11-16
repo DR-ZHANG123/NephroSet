@@ -15,7 +15,7 @@ TG = {"yres_pt_injury": "PT injury (cell)", "yunit_pt_injury": "PT injury (unit)
 LV = ["A", "AB", "ABC", "ABD", "ABDu", "ABDh", "ABCD"]
 LVL = {"A": "A", "AB": "A+B", "ABC": "A+B+C", "ABD": "A+B+D", "ABDu": "A+B+unit", "ABDh": "A+B+halo", "ABCD": "A+B+C+D"}
 PROG = {"pt_injury": "PT injury", "inflammation": "Inflammation", "pt_transport": "PT transport"}
-ORDER = ["gbm_measured_comp", "gbm_comp_morph", "hist2st", "bleep", "istar", "ridge_image", "mlp", "gcn", "gat", "clique_gcn", "hgnn_ring",
+ORDER = ["gbm_measured_comp", "gbm_comp_morph", "hist2st", "bleep", "istar", "knn_encoder", "tok_pred_mean", "ridge_image", "mlp", "gcn", "gat", "clique_gcn", "hgnn_ring",
          "hgnn_anat", "deepsets", "set_ring", "set_anat", "set_anat_rewired", "set_anat_noroles", "set_anat_nogeom",
          "tok_mean", "tok_abmil", "tok_gat", "tok_hyper_window", "tok_hyper_rolebag", "tok_hyper_rewired",
          "tok_hyper_profile", "tok_hyper_anat", "tok_hyper_anat_ctx", "tok_abmil_ctx"]
@@ -63,7 +63,7 @@ def fig_s2():
         im = ax.imshow(M, cmap="viridis", aspect="auto", vmin=0, vmax=max(0.65, M.max()))
         for i in range(M.shape[0]):
             for j in range(M.shape[1]):
-                ax.text(j, i, f"{M[i, j]:.2f}".replace("-", "\u2212"), ha="center", va="center", fontsize=4.6,
+                ax.text(j, i, f"{M[i, j] + 0.0:.2f}".replace("-0.00", "0.00").replace("-", "\u2212"), ha="center", va="center", fontsize=4.6,
                         color="white" if M[i, j] < 0.4 else "black")._allow_on_data = True
         ax.set_xticks(range(len(cols)))
         ax.set_xticklabels([c[2] for c in cols], fontsize=5.3)

@@ -1,6 +1,7 @@
 """Main-text Table 2 and the Additional file 2 workbook, written from result tables only."""
 from __future__ import annotations
 
+import re
 import sys
 from pathlib import Path
 
@@ -13,6 +14,8 @@ cfg = load_config()
 S = stage_dir("21_tables")
 MODELS = [("gbm_measured_comp", r"Measured composition\textsuperscript{a}"), ("gbm_comp_morph", "Image composition and morphology"),
           ("hist2st", "Hist2ST"), ("bleep", "BLEEP"), ("istar", "iStar"),
+          ("knn_encoder", r"Retrieval, same encoder\textsuperscript{b}"),
+          ("tok_pred_mean", r"Token-level prediction, same encoder\textsuperscript{c}"),
           ("ridge_image", "Linear probe"), ("mlp", "Spot only"), ("gcn", "Lattice graph (GCN)"),
           ("set_anat", "Anatomical spot hypergraph"), ("deepsets", "Neighbourhood set"),
           ("tok_abmil", "Token attention"), ("tok_hyper_anat", "Anatomical token hypergraph"),
@@ -20,7 +23,7 @@ MODELS = [("gbm_measured_comp", r"Measured composition\textsuperscript{a}"), ("g
 
 
 def f(x, lo=None, hi=None):
-    g = lambda v: f"{v:.2f}".replace("-", "$-$")
+    g = lambda v: f"{v:.2f}".replace("-0.00", "0.00").replace("-", "$-$")
     return g(x) if lo is None else f"{g(x)} ({g(lo)}--{g(hi)})"
 
 
@@ -56,7 +59,7 @@ def main() -> None:
         .groupby(["cls"]).r.agg(["mean", "std", "count"]).reset_index(),
         "Table S6 external": ex,
         "Table S6b external contrasts": pd.read_csv(p("results/18_evaluate_external/contrasts.tsv"), sep="\t"),
-        "Table S7 ceilings regions": pd.concat([
+        "Table S7 reliability regions": pd.concat([
             pd.read_csv(p("results/16b_reliability_region/summary.tsv"), sep="\t").assign(cohort="KPMP"),
             pd.read_csv(p("results/18b_external_reliability/ceiling.tsv"), sep="\t").assign(cohort="External ceiling"),
             pd.read_csv(p("results/18c_external_region_coverage/region_summary.tsv"), sep="\t").assign(cohort="External")]),
@@ -64,7 +67,15 @@ def main() -> None:
             pd.read_csv(p("results/20_subgroups/subgroups.tsv"), sep="\t"),
             pd.read_csv(p("results/18c_external_region_coverage/coverage.tsv"), sep="\t").assign(grouping="coverage"),
             pd.read_csv(p("results/17_confidence/conformal_cv.tsv"), sep="\t").assign(grouping="coverage KPMP folds")]),
+        "Table S9 composition models": pd.read_csv(p("results/16f_adjustment_sensitivity/summary.tsv"), sep="\t"),
+        "Table S9b composition contrasts": pd.read_csv(p("results/16f_adjustment_sensitivity/contrasts.tsv"), sep="\t"),
+        "Table S10 reliability": pd.read_csv(p("results/16g_reliability_sensitivity/summary.tsv"), sep="\t"),
+        "Table S11 external donors": pd.read_csv(p("results/18d_external_donors/donor_metrics.tsv"), sep="\t"),
+        "Table S11b seeds": pd.read_csv(p("results/18d_external_donors/seed_stability.tsv"), sep="\t"),
     }
+    cost = p("results/21b_model_cost/model_cost.tsv")
+    if cost.exists():
+        sheets["Table S12 model cost"] = pd.read_csv(cost, sep="\t")
     keep = ["participant", "section", "status", "n_spots_tissue", "frac_spots_on_tissue", "um_per_px",
             "enrollment_category", "primary_adjudicated_category", "sample_type", "tissue_source", "age_binned", "sex",
             "baseline_egfr", "diabetes_history", "hypertension_history", "n_spots_spots", "median_umi"]
@@ -81,8 +92,26 @@ def main() -> None:
             "Token roles: within-section correlation of spot-mean token roles with measured composition, held-out participants",
             "External cohort: agreement for every model, programme and metric",
             "External cohort: paired model differences by donor",
-            "Reliability ceilings and regional agreement, both cohorts",
-            "Agreement by diagnosis and tissue source; interval coverage"]})
+            "Split-half reliability and regional agreement, both cohorts",
+            "Agreement by diagnosis and tissue source; interval coverage",
+            "Agreement beyond composition under alternative composition models and in PT-rich spots",
+            "Paired differences of NephroSet from reference models under each composition model",
+            "Split-half reliability of measured scores under alternative splits and estimators",
+            "Second centre: agreement of each model for every donor, with measured spread and diagnosis",
+            "Second centre: donor-mean agreement of single seeds and of seed ensembles",
+            "Trainable parameters, inference time and training cost of each model"][:len(sheets)]})
+        # number the sheets in the order in which the tables are first cited in the text
+        renum = {4: 6, 5: 7, 6: 9, 7: 10, 8: 12, 9: 5, 10: 4, 11: 11, 12: 8}
+
+        def new_key(k):
+            m = re.match(r"Table S(\d+)(.*)", k)
+            return f"Table S{renum.get(int(m.group(1)), int(m.group(1)))}{m.group(2)}"
+        readme["sheet"] = [new_key(k) for k in readme.sheet]
+        sheets = {new_key(k): v for k, v in sheets.items()}
+        num = lambda k: (int(re.match(r"Table S(\d+)", k).group(1)), k)
+        order = sorted(sheets, key=num)
+        readme = readme.set_index("sheet").loc[order].reset_index()
+        sheets = {k: sheets[k] for k in order}
         readme.to_excel(w, sheet_name="README", index=False)
         for k, v in sheets.items():
             v.to_excel(w, sheet_name=k[:31], index=False)

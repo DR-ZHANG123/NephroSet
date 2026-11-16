@@ -12,11 +12,14 @@ gated attention pooling and the neighbouring spots as an unordered set.
 - `config/run.yaml`: every analysis parameter (programme gene sets, folds, seeds, model settings).
 - `scripts/stages/`: numbered analysis stages. Each writes its tables to `results/<stage>/`.
   - `00`–`04`: download and single-cell spatial organisation (CosMx and Xenium).
-  - `10`–`13`: KPMP and GSE211785 Visium data, targets, composition and image features.
+  - `10`–`13`: KPMP and GSE211785 Visium data, targets, composition and image features
+    (`12c` fits the token projection within each cross-validation fold on its training participants).
   - `14`–`15`: participant-held-out cross-validation and the external cohort for all spot and token models
     (`14b`/`15b` token models including NephroSet = `tok_abmil_ctx`; `14c`–`14e`/`15c`–`15e` iStar, Hist2ST and
-    BLEEP retrained on the same participants and targets).
-  - `16`–`21`: evaluation, reliability ceilings, token attention, confidence, subgroups and tables.
+    BLEEP retrained on the same participants and targets; `14f` and `tok_pred_mean` apply the prediction rules
+    of BLEEP and iStar to the shared image encoder).
+  - `16`–`21`: evaluation, split-half reliability (with alternative definitions), alternative composition
+    adjustments, token attention, confidence, results by external donor and seed, subgroups, tables and model cost.
 - `scripts/lib/`: data handling, models, evaluation and the published-method adapters.
 - `scripts/figures/`: plotting only; reads `figures/source_data/`.
 - `results/`, `figures/source_data/`: the tables behind every number and figure in the article.

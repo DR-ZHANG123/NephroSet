@@ -6,3 +6,171 @@ paths:
   cache: data/cache
 # Optional local copies of the public raw files (hardlinked instead of downloaded)
 mirrors: []
+kpmp:
+  search_url: https://atlas.kpmp.org/spatial-viewer/search/api/as/v1/engines/atlas-repository/search.json
+  search_key: search-vwz67uj2sf8h83h4y8i8j6g3   # public read-only key of the repository front end
+  strategy: Spatial Transcriptomics Visium
+  formats: [tif, "h5 jpg csv png json", "tsv mtx", xlsx]
+geo:
+  GSE211785:
+    series_files: [GSE211785_EXPORT_ST_counts.rds.gz, GSE211785_ST_metadata.txt.gz, GSE211785_RAW.tar, GSE211785_series_matrix.txt.gz]
+zenodo:
+  record: 19868428
+  files: [spatial_adata_xenium_cosmx_zenodo.h5ad, Diagnosis.xlsx]
+# Literature-defined programmes (fixed before any model was trained)
+programmes:
+  pt_injury: [HAVCR1, VCAM1, PROM1, CDH6, ITGB8, DCDC2, SOX9, KRT8, KRT18, VIM, CD44, SPP1, LCN2, TPM1, CCL2]
+  inflammation: [C3, CFB, CXCL10, CCL5, ICAM1, TNFAIP3, NFKBIA, IL32, SAA1, SERPINA3]
+  pt_transport: [LRP2, CUBN, SLC34A1, SLC5A12, SLC22A6, SLC22A8, SLC13A3, ALDOB, PCK1, MIOX, GATM, SLC5A2]
+atlas:
+  min_gene_detection: 0.01        # gene counted as measured on a platform if detected in >=1% of cells
+  min_pt_cells: 500
+  n_target: 4000                  # PT cells sampled per section
+  r_local: 30
+  r_region: 150
+  rings: [15, 30, 60]
+  r_ball: 30
+  r_pair: 12
+  r_unit: 40
+  d_contact: 12
+  d_halo: 12
+  perm_tile: 100
+  n_jobs: 32
+  cosmx_um_per_px: 0.12028        # CosMx SMI global pixel size
+  coarse_map: {PT: PT, iPT: PT, TAL: LOH, iTAL: LOH, DTL_ATL: LOH, DCT: DCT_CNT, CNT: DCT_CNT,
+               PC: CD, "IC A": CD, "IC B": CD, EC_DVR: Endothelial, EC_Lymph: Endothelial,
+               EC_Peritub: Endothelial, EC_glom: Endothelial, Fibroblast: Fibroblast,
+               VSMC: Mural, MC1: Mural, Immune: Immune, Podo: Glomerular, PEC: Glomerular}
+atlas_model:
+  n_folds: 5
+  n_estimators: 400
+  learning_rate: 0.03
+  num_leaves: 31
+  min_child_samples: 100
+  n_boot: 2000
+  n_jobs: 32
+kpmp_qc:
+  min_frac_on_tissue: 0.9
+  min_spots: 100
+reference:
+  url: https://datasets.cellxgene.cziscience.com/06b8d9c2-0bde-48bd-88d9-730993fc95e2.h5ad   # KPMP snRNA atlas (Lake et al. 2023, CELLxGENE)
+  file: kpmp_v2_snRNA.h5ad
+  label: SubclassLevel1
+  coarse_map: {PT: PT, TAL: LOH, DTL: LOH, ATL: LOH, DCT: DCT_CNT, CNT: DCT_CNT, PC: CD, IC: CD, PapE: CD,
+               POD: Glomerular, PEC: Glomerular, EC: Endothelial, FIB: Fibroblast, "VSM/P": Mural,
+               Lymphoid: Immune, Myeloid: Immune}
+  n_per_class: 4000
+  n_markers: 40
+  min_cp10k: 2.0
+visium:
+  min_umi: 500
+  ctrl_size: 50
+image:
+  encoder: owkin/phikon-v2      # frozen ViT-L pathology encoder (public weights)
+  device: cuda:0
+  scale1_um: 112
+  scale2_um: 448
+  batch: 128
+  prefetch: 24
+tokens:
+  n_pcs: 128
+  n_fit_sections: 24
+  n_fit_spots: 300
+train:
+  device: cuda:0
+  n_folds: 5
+  val_frac: 0.15
+  hidden: 256
+  dropout: 0.2
+  lr: 0.001
+  weight_decay: 0.01
+  max_epochs: 40
+  patience: 8
+  programme_weights: [1.0, 0.5, 0.5]
+  comp_weight: 0.5
+  role_alpha: 1000.0
+  ridge_alpha: 1000.0
+  unit_grid: [4, 7, 10]
+  ring_grid: [1, 2]
+evaluate:
+  pt_rich_min: 0.5
+  n_boot: 2000
+  models: [ridge_image, gbm_comp_morph, gbm_measured_comp, mlp, deepsets, gcn, gat, clique_gcn, hgnn_ring,
+           hgnn_anat, set_ring, set_anat, set_anat_rewired, set_anat_noroles, set_anat_nogeom,
+           ridge_image_sn, gbm_comp_morph_sn, mlp_sn, deepsets_sn, gcn_sn, set_ring_sn, set_anat_sn,
+           tok_mean, tok_abmil, tok_gat, tok_hyper_window, tok_hyper_rolebag, tok_hyper_rewired,
+           tok_hyper_profile, tok_hyper_anat, tok_abmil_ctx, tok_hyper_anat_ctx, istar, bleep, hist2st,
+           knn_encoder, tok_pred_mean]
+  contrasts:
+    - [mlp, ridge_image]
+    - [mlp, gbm_comp_morph]
+    - [gcn, mlp]
+    - [deepsets, mlp]
+    - [set_anat, mlp]
+    - [set_anat, gcn]
+    - [set_anat, gat]
+    - [set_anat, deepsets]
+    - [set_anat, clique_gcn]
+    - [set_anat, hgnn_ring]
+    - [set_anat, hgnn_anat]
+    - [set_anat, set_ring]
+    - [set_anat, set_anat_rewired]
+    - [set_anat, set_anat_noroles]
+    - [set_anat, set_anat_nogeom]
+    - [deepsets_sn, deepsets]
+    - [mlp_sn, mlp]
+    - [ridge_image_sn, ridge_image]
+    - [set_anat_sn, set_anat]
+    - [deepsets_sn, mlp_sn]
+    - [deepsets_sn, gcn_sn]
+    - [set_anat_sn, set_ring_sn]
+    - [set_anat_sn, deepsets_sn]
+    - [deepsets, gbm_measured_comp]
+    - [deepsets_sn, gbm_measured_comp]
+    - [tok_abmil, mlp]
+    - [tok_mean, mlp]
+    - [tok_gat, tok_abmil]
+    - [tok_hyper_anat, tok_abmil]
+    - [tok_hyper_anat, tok_gat]
+    - [tok_hyper_anat, tok_hyper_rewired]
+    - [tok_hyper_anat, tok_hyper_rolebag]
+    - [tok_hyper_anat, tok_hyper_window]
+    - [tok_hyper_anat, tok_hyper_profile]
+    - [tok_hyper_anat_ctx, deepsets]
+    - [tok_hyper_anat_ctx, tok_abmil_ctx]
+    - [tok_abmil_ctx, deepsets]
+    - [tok_abmil_ctx, mlp]
+    - [tok_abmil_ctx, gbm_measured_comp]
+    - [tok_abmil_ctx, gbm_comp_morph]
+    - [tok_abmil_ctx, tok_abmil]
+    - [tok_abmil_ctx, istar]
+    - [tok_abmil_ctx, bleep]
+    - [tok_abmil_ctx, hist2st]
+    - [mlp, istar]
+    - [mlp, bleep]
+    - [tok_abmil_ctx, tok_gat]
+    - [tok_abmil_ctx, ridge_image]
+    - [tok_abmil_ctx, tok_mean]
+    - [tok_abmil_ctx, knn_encoder]
+    - [tok_abmil_ctx, tok_pred_mean]
+    - [knn_encoder, bleep]
+    - [tok_pred_mean, istar]
+confidence:
+  model: tok_abmil_ctx
+  n_pcs: 20
+  n_pca_fit: 50000
+  keep_fracs: [1.0, 0.9, 0.8, 0.7, 0.6, 0.5]
+  alpha: 0.1
+  sd_floor: 0.02
+region:
+  tile_rows: 4        # 4 lattice rows  ~ 350 um
+  tile_cols: 8        # 8 lattice columns ~ 400 um
+  min_spots: 6
+  min_tiles: 10
+  n_splits: 20
+examples:
+  atlas_section: 1006_Xenium
+  window_um: 240
+  model: tok_abmil_ctx
+  thumb_px: 900
+  min_spots: 500

@@ -46,6 +46,7 @@ MODEL_LABEL = {
     "tok_hyper_window": "Token hypergraph, windows", "tok_hyper_rolebag": "Token hypergraph, compartments",
     "tok_hyper_rewired": "Token hypergraph, random", "tok_hyper_profile": "Token hypergraph, profiles",
     "tok_hyper_anat": "Anatomical token hypergraph", "istar": "iStar", "bleep": "BLEEP", "hist2st": "Hist2ST", "tok_hyper_anat_ctx": "Anatomical token hypergraph + set",
+    "knn_encoder": "Retrieval, same encoder", "tok_pred_mean": "Token-level prediction, same encoder",
 }
 
 

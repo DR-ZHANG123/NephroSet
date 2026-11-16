@@ -36,10 +36,12 @@ DEV = T["device"]
 OUTC = p(cfg["paths"]["cache"]) / "cv_predictions"
 
 
-def load_tokens(sections, cohort="kpmp"):
+def load_tokens(sections, cohort="kpmp", fold=None):
+    """fold: use the token projection fitted on that fold's training participants (12c)."""
+    sub = f"tok_{cohort}" if fold is None else f"tok_{cohort}_fold{fold}"
     out = {}
     for s in sections:
-        z = np.load(p(cfg["paths"]["cache"]) / f"tok_{cohort}" / f"{s}.npz", allow_pickle=True)
+        z = np.load(p(cfg["paths"]["cache"]) / sub / f"{s}.npz", allow_pickle=True)
         out[s] = (torch.as_tensor(z["tok"]), torch.as_tensor(z["col"]), z["barcode"])
     return out
 
@@ -102,9 +104,6 @@ def main() -> None:
     sections = sections_kpmp()
     data = D.load_cohort(p(cfg["paths"]["interim"]) / "kpmp_spots",
                          p(cfg["paths"]["cache"]) / "img_kpmp", sections.section)
-    tok = load_tokens(sections.section)
-    for s in sections.section:
-        assert (tok[s][2] == data[s]["table"].index.values).all(), s
     log, rows = [], {n: [] for n in names}
     for fi, (tr_all, te) in enumerate(D.participant_folds(sections, T["n_folds"], cfg["seed"])):
         done = all((OUTC / f"{n}_fold{fi}.parquet").exists() for n in names)
@@ -113,6 +112,9 @@ def main() -> None:
         if done and "--resume" in _argv:  # every fold is seeded independently, so finished folds are reused
             continue
         rng = np.random.default_rng(cfg["seed"] + fi)
+        tok = load_tokens(sections.section, fold=fi)
+        for s in sections.section:
+            assert (tok[s][2] == data[s]["table"].index.values).all(), s
         tr, va = D.split_validation(sections, tr_all, T["val_frac"], rng)
         roles_tr = D.oof_roles(data, tr, T["role_alpha"], 3, rng)
         rm = D.role_model(data, tr, T["role_alpha"])

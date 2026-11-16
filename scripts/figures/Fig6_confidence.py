@@ -73,14 +73,17 @@ def main() -> None:
     q = cur[cur.programme == "pt_injury"]
     for sc, col, lab in [("sd_pt_injury", PAL["anatomy"], "Ensemble disagreement"), ("novelty", PAL["group"], "Image novelty")]:
         z = q[q.score == sc].sort_values("keep_frac", ascending=False)
-        ax.plot(z.keep_frac * 100, z.mae, marker="o", ms=2.5, lw=1, color=col, label=lab)
+        base = z.mae[z.keep_frac == 1.0].iloc[0]
+        ax.plot(z.keep_frac * 100, 100 * (z.mae / base - 1), marker="o", ms=2.5, lw=1, color=col, label=lab)
+    q = q.assign(mae_change_pct=q.groupby("score").mae.transform(lambda v: 100 * (v / v[q.loc[v.index, "keep_frac"] == 1.0].iloc[0] - 1)))
+    ln = ax.axhline(0, c="0.6", lw=0.6)
+    ln._is_reference = True
     ax.invert_xaxis()
     ax.set_xlabel("Spots retained (%)")
-    ax.set_ylabel("Mean absolute error, PT injury")
+    ax.set_ylabel("Change in mean absolute error,\nPT injury (%)")
     ax.set_title("Selective prediction", pad=3)
-    lo, hi = q.mae.min(), q.mae.max()
-    ax.set_ylim(lo - 0.0008, hi + 0.0016)
-    ax.legend(loc="upper right", fontsize=5.2, borderaxespad=0.2)
+    ax.set_ylim(-3, 1)
+    ax.legend(loc="lower left", fontsize=5.2, borderaxespad=0.2)
     label(ax, "d")
     save(fig, "Fig6", {"a_diagnosis": pd.DataFrame(r1), "b_source": pd.DataFrame(r2), "c_coverage": pd.DataFrame(rows),
                        "d_retained": q})

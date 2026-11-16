@@ -49,6 +49,26 @@ all"	0.0482698416546294
 istar	pt_injury	"2nd
 centre
 adj."	0.0352793099547663
+knn_encoder	pt_injury	"KPMP
+all"	0.1004047030186533
+knn_encoder	pt_injury	"KPMP
+adj."	0.0893176594305409
+knn_encoder	pt_injury	"2nd
+centre
+all"	0.0180885140424416
+knn_encoder	pt_injury	"2nd
+centre
+adj."	-0.0014067775405603
+tok_pred_mean	pt_injury	"KPMP
+all"	0.2362712541855693
+tok_pred_mean	pt_injury	"KPMP
+adj."	0.2095237694488309
+tok_pred_mean	pt_injury	"2nd
+centre
+all"	0.0863764994058624
+tok_pred_mean	pt_injury	"2nd
+centre
+adj."	0.0693199789231064
 ridge_image	pt_injury	"KPMP
 all"	0.2059181231299853
 ridge_image	pt_injury	"KPMP
@@ -180,9 +200,9 @@ set_anat_nogeom	pt_injury	"2nd
 centre
 adj."	0.0856146845630068
 tok_mean	pt_injury	"KPMP
-all"	0.2463375541214935
+all"	0.2488311826721193
 tok_mean	pt_injury	"KPMP
-adj."	0.2177021655097157
+adj."	0.2202080858257926
 tok_mean	pt_injury	"2nd
 centre
 all"	0.0823810723451697
@@ -190,9 +210,9 @@ tok_mean	pt_injury	"2nd
 centre
 adj."	0.0785484638402101
 tok_abmil	pt_injury	"KPMP
-all"	0.2591634843947863
+all"	0.2572614416918797
 tok_abmil	pt_injury	"KPMP
-adj."	0.2273548116106918
+adj."	0.2258502000484424
 tok_abmil	pt_injury	"2nd
 centre
 all"	0.1293803885697994
@@ -200,9 +220,9 @@ tok_abmil	pt_injury	"2nd
 centre
 adj."	0.1128751249322991
 tok_gat	pt_injury	"KPMP
-all"	0.2629712771865932
+all"	0.2658064116185792
 tok_gat	pt_injury	"KPMP
-adj."	0.2318214071433872
+adj."	0.2343956918933988
 tok_gat	pt_injury	"2nd
 centre
 all"	0.1278116091982436
@@ -210,9 +230,9 @@ tok_gat	pt_injury	"2nd
 centre
 adj."	0.1158493261161801
 tok_hyper_window	pt_injury	"KPMP
-all"	0.2641670975327422
+all"	0.2630624139653647
 tok_hyper_window	pt_injury	"KPMP
-adj."	0.2335556851429308
+adj."	0.2313481365768617
 tok_hyper_window	pt_injury	"2nd
 centre
 all"	0.1073669503390105
@@ -220,9 +240,9 @@ tok_hyper_window	pt_injury	"2nd
 centre
 adj."	0.0980558883102728
 tok_hyper_rolebag	pt_injury	"KPMP
-all"	0.2627484581647543
+all"	0.2676445268595279
 tok_hyper_rolebag	pt_injury	"KPMP
-adj."	0.2323236064907654
+adj."	0.2359776064418846
 tok_hyper_rolebag	pt_injury	"2nd
 centre
 all"	0.0838094900543717
@@ -230,9 +250,9 @@ tok_hyper_rolebag	pt_injury	"2nd
 centre
 adj."	0.0802351645886725
 tok_hyper_rewired	pt_injury	"KPMP
-all"	0.2637256745846931
+all"	0.2669633821399622
 tok_hyper_rewired	pt_injury	"KPMP
-adj."	0.233157432209857
+adj."	0.2356678237490245
 tok_hyper_rewired	pt_injury	"2nd
 centre
 all"	0.1021659808995765
@@ -240,9 +260,9 @@ tok_hyper_rewired	pt_injury	"2nd
 centre
 adj."	0.0920786693932329
 tok_hyper_profile	pt_injury	"KPMP
-all"	0.2629601734464986
+all"	0.2668120138798642
 tok_hyper_profile	pt_injury	"KPMP
-adj."	0.2329053023894656
+adj."	0.2363975731720553
 tok_hyper_profile	pt_injury	"2nd
 centre
 all"	0.116333443954847
@@ -250,9 +270,9 @@ tok_hyper_profile	pt_injury	"2nd
 centre
 adj."	0.1051298270176932
 tok_hyper_anat	pt_injury	"KPMP
-all"	0.2588693312173542
+all"	0.2642411959440224
 tok_hyper_anat	pt_injury	"KPMP
-adj."	0.2278930069452567
+adj."	0.2330258569825013
 tok_hyper_anat	pt_injury	"2nd
 centre
 all"	0.1055333765984403
@@ -260,9 +280,9 @@ tok_hyper_anat	pt_injury	"2nd
 centre
 adj."	0.0913263323980478
 tok_hyper_anat_ctx	pt_injury	"KPMP
-all"	0.2658983742197844
+all"	0.2647032477855221
 tok_hyper_anat_ctx	pt_injury	"KPMP
-adj."	0.2350197057765078
+adj."	0.2339619473176394
 tok_hyper_anat_ctx	pt_injury	"2nd
 centre
 all"	0.0786163010954922
@@ -270,9 +290,9 @@ tok_hyper_anat_ctx	pt_injury	"2nd
 centre
 adj."	0.0735393081616093
 tok_abmil_ctx	pt_injury	"KPMP
-all"	0.262499403695314
+all"	0.261428731238204
 tok_abmil_ctx	pt_injury	"KPMP
-adj."	0.2319104969173891
+adj."	0.2303748539452522
 tok_abmil_ctx	pt_injury	"2nd
 centre
 all"	0.148792170764195
@@ -329,6 +349,26 @@ all"	0.0718728455276027
 istar	inflammation	"2nd
 centre
 adj."	0.034397942062019
+knn_encoder	inflammation	"KPMP
+all"	0.0882587251156826
+knn_encoder	inflammation	"KPMP
+adj."	0.0628662122667677
+knn_encoder	inflammation	"2nd
+centre
+all"	0.0589117759872453
+knn_encoder	inflammation	"2nd
+centre
+adj."	0.0262996047958501
+tok_pred_mean	inflammation	"KPMP
+all"	0.2062148130065963
+tok_pred_mean	inflammation	"KPMP
+adj."	0.1378078382695048
+tok_pred_mean	inflammation	"2nd
+centre
+all"	0.133362093415447
+tok_pred_mean	inflammation	"2nd
+centre
+adj."	0.0658055014588771
 ridge_image	inflammation	"KPMP
 all"	0.1671559057333462
 ridge_image	inflammation	"KPMP
@@ -460,9 +500,9 @@ set_anat_nogeom	inflammation	"2nd
 centre
 adj."	0.082142852503045
 tok_mean	inflammation	"KPMP
-all"	0.2119354023543512
+all"	0.2102615690335733
 tok_mean	inflammation	"KPMP
-adj."	0.1438393751257698
+adj."	0.14433916849745
 tok_mean	inflammation	"2nd
 centre
 all"	0.1339722450376896
@@ -470,9 +510,9 @@ tok_mean	inflammation	"2nd
 centre
 adj."	0.071151929800907
 tok_abmil	inflammation	"KPMP
-all"	0.2169763038254398
+all"	0.2171249403345988
 tok_abmil	inflammation	"KPMP
-adj."	0.1471085277317916
+adj."	0.1472923943151652
 tok_abmil	inflammation	"2nd
 centre
 all"	0.1468311273685066
@@ -480,9 +520,9 @@ tok_abmil	inflammation	"2nd
 centre
 adj."	0.0821983245891844
 tok_gat	inflammation	"KPMP
-all"	0.2218575842498455
+all"	0.2224850553871178
 tok_gat	inflammation	"KPMP
-adj."	0.1506747352521002
+adj."	0.1517294386897869
 tok_gat	inflammation	"2nd
 centre
 all"	0.147532394305834
@@ -490,9 +530,9 @@ tok_gat	inflammation	"2nd
 centre
 adj."	0.081816608003887
 tok_hyper_window	inflammation	"KPMP
-all"	0.2211693410087
+all"	0.2186048123416699
 tok_hyper_window	inflammation	"KPMP
-adj."	0.1512421844794863
+adj."	0.1485893984278361
 tok_hyper_window	inflammation	"2nd
 centre
 all"	0.128993866850395
@@ -500,9 +540,9 @@ tok_hyper_window	inflammation	"2nd
 centre
 adj."	0.0645838282543051
 tok_hyper_rolebag	inflammation	"KPMP
-all"	0.2205043366265501
+all"	0.2227632106175013
 tok_hyper_rolebag	inflammation	"KPMP
-adj."	0.1506767353688441
+adj."	0.1525990306702393
 tok_hyper_rolebag	inflammation	"2nd
 centre
 all"	0.1336227870385123
@@ -510,9 +550,9 @@ tok_hyper_rolebag	inflammation	"2nd
 centre
 adj."	0.0747281599230731
 tok_hyper_rewired	inflammation	"KPMP
-all"	0.2210846868252695
+all"	0.2185913437130703
 tok_hyper_rewired	inflammation	"KPMP
-adj."	0.1515133343838626
+adj."	0.149432932491294
 tok_hyper_rewired	inflammation	"2nd
 centre
 all"	0.1417516286928921
@@ -520,9 +560,9 @@ tok_hyper_rewired	inflammation	"2nd
 centre
 adj."	0.074746130378563
 tok_hyper_profile	inflammation	"KPMP
-all"	0.2213166270634602
+all"	0.2208067031496099
 tok_hyper_profile	inflammation	"KPMP
-adj."	0.1503904193442644
+adj."	0.1501085988798909
 tok_hyper_profile	inflammation	"2nd
 centre
 all"	0.1473853500946769
@@ -530,9 +570,9 @@ tok_hyper_profile	inflammation	"2nd
 centre
 adj."	0.081266399265879
 tok_hyper_anat	inflammation	"KPMP
-all"	0.218520620913185
+all"	0.2172201185923516
 tok_hyper_anat	inflammation	"KPMP
-adj."	0.1480428749109945
+adj."	0.1477434455677912
 tok_hyper_anat	inflammation	"2nd
 centre
 all"	0.1539144939262853
@@ -540,9 +580,9 @@ tok_hyper_anat	inflammation	"2nd
 centre
 adj."	0.0851634070756398
 tok_hyper_anat_ctx	inflammation	"KPMP
-all"	0.2197411158579067
+all"	0.2228477819046999
 tok_hyper_anat_ctx	inflammation	"KPMP
-adj."	0.149663947877185
+adj."	0.1521068541424154
 tok_hyper_anat_ctx	inflammation	"2nd
 centre
 all"	0.1407770524570893
@@ -550,9 +590,9 @@ tok_hyper_anat_ctx	inflammation	"2nd
 centre
 adj."	0.0722855197624495
 tok_abmil_ctx	inflammation	"KPMP
-all"	0.2224424779815253
+all"	0.2172904283125756
 tok_abmil_ctx	inflammation	"KPMP
-adj."	0.1501210435553889
+adj."	0.1469748771013308
 tok_abmil_ctx	inflammation	"2nd
 centre
 all"	0.1571194039066835
@@ -609,6 +649,26 @@ all"	0.2153586373932574
 istar	pt_transport	"2nd
 centre
 adj."	0.1065033558337907
+knn_encoder	pt_transport	"KPMP
+all"	0.4841549499546621
+knn_encoder	pt_transport	"KPMP
+adj."	0.3679719797047144
+knn_encoder	pt_transport	"2nd
+centre
+all"	0.3473190583130795
+knn_encoder	pt_transport	"2nd
+centre
+adj."	0.1801905922759431
+tok_pred_mean	pt_transport	"KPMP
+all"	0.6195338499883425
+tok_pred_mean	pt_transport	"KPMP
+adj."	0.4836607376743392
+tok_pred_mean	pt_transport	"2nd
+centre
+all"	0.4371808155435392
+tok_pred_mean	pt_transport	"2nd
+centre
+adj."	0.2745702161533229
 ridge_image	pt_transport	"KPMP
 all"	0.5923887677690602
 ridge_image	pt_transport	"KPMP
@@ -740,9 +800,9 @@ set_anat_nogeom	pt_transport	"2nd
 centre
 adj."	0.2625742966895937
 tok_mean	pt_transport	"KPMP
-all"	0.6203624265599171
+all"	0.6255140952095296
 tok_mean	pt_transport	"KPMP
-adj."	0.4924441536848509
+adj."	0.4963351124585803
 tok_mean	pt_transport	"2nd
 centre
 all"	0.445663915331178
@@ -750,9 +810,9 @@ tok_mean	pt_transport	"2nd
 centre
 adj."	0.2627090905418095
 tok_abmil	pt_transport	"KPMP
-all"	0.6317911243649562
+all"	0.6337752525050648
 tok_abmil	pt_transport	"KPMP
-adj."	0.5029173851549661
+adj."	0.5041362888203752
 tok_abmil	pt_transport	"2nd
 centre
 all"	0.5002419848722091
@@ -760,9 +820,9 @@ tok_abmil	pt_transport	"2nd
 centre
 adj."	0.3132651914138711
 tok_gat	pt_transport	"KPMP
-all"	0.6368113582389109
+all"	0.6358524678180392
 tok_gat	pt_transport	"KPMP
-adj."	0.5050412434156571
+adj."	0.5049414860831409
 tok_gat	pt_transport	"2nd
 centre
 all"	0.4754564901999681
@@ -770,9 +830,9 @@ tok_gat	pt_transport	"2nd
 centre
 adj."	0.276680739932842
 tok_hyper_window	pt_transport	"KPMP
-all"	0.633106629176994
+all"	0.6318138419098718
 tok_hyper_window	pt_transport	"KPMP
-adj."	0.5029034630004542
+adj."	0.5037899454221485
 tok_hyper_window	pt_transport	"2nd
 centre
 all"	0.4611613559312523
@@ -780,9 +840,9 @@ tok_hyper_window	pt_transport	"2nd
 centre
 adj."	0.2659048587556073
 tok_hyper_rolebag	pt_transport	"KPMP
-all"	0.6327952897352951
+all"	0.6322062306089357
 tok_hyper_rolebag	pt_transport	"KPMP
-adj."	0.5044902547977126
+adj."	0.5043034723924634
 tok_hyper_rolebag	pt_transport	"2nd
 centre
 all"	0.4615997904399378
@@ -790,9 +850,9 @@ tok_hyper_rolebag	pt_transport	"2nd
 centre
 adj."	0.2690222990715792
 tok_hyper_rewired	pt_transport	"KPMP
-all"	0.6327375390632201
+all"	0.6312485155419711
 tok_hyper_rewired	pt_transport	"KPMP
-adj."	0.5018869762830575
+adj."	0.5025865198196614
 tok_hyper_rewired	pt_transport	"2nd
 centre
 all"	0.501228656956962
@@ -800,9 +860,9 @@ tok_hyper_rewired	pt_transport	"2nd
 centre
 adj."	0.3071729817790575
 tok_hyper_profile	pt_transport	"KPMP
-all"	0.6314916291716025
+all"	0.6322253533383354
 tok_hyper_profile	pt_transport	"KPMP
-adj."	0.502194560406424
+adj."	0.5036044475268192
 tok_hyper_profile	pt_transport	"2nd
 centre
 all"	0.4926088786646144
@@ -810,9 +870,9 @@ tok_hyper_profile	pt_transport	"2nd
 centre
 adj."	0.3063667078901641
 tok_hyper_anat	pt_transport	"KPMP
-all"	0.6315637501904128
+all"	0.6337580463676143
 tok_hyper_anat	pt_transport	"KPMP
-adj."	0.5010819155842596
+adj."	0.5043028515441104
 tok_hyper_anat	pt_transport	"2nd
 centre
 all"	0.4853460451199642
@@ -820,9 +880,9 @@ tok_hyper_anat	pt_transport	"2nd
 centre
 adj."	0.2964120101318029
 tok_hyper_anat_ctx	pt_transport	"KPMP
-all"	0.6353225401840611
+all"	0.6329256547298263
 tok_hyper_anat_ctx	pt_transport	"KPMP
-adj."	0.5049939715653337
+adj."	0.5034407682425651
 tok_hyper_anat_ctx	pt_transport	"2nd
 centre
 all"	0.4360297323434719
@@ -830,9 +890,9 @@ tok_hyper_anat_ctx	pt_transport	"2nd
 centre
 adj."	0.2413833502895081
 tok_abmil_ctx	pt_transport	"KPMP
-all"	0.6344890905435765
+all"	0.6335320938326711
 tok_abmil_ctx	pt_transport	"KPMP
-adj."	0.5046972253056388
+adj."	0.5026179476788322
 tok_abmil_ctx	pt_transport	"2nd
 centre
 all"	0.4898945635150901

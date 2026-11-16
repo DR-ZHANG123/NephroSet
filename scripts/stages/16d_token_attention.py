@@ -400,18 +400,18 @@ def example_arrays(ex, cache):
 
 def main() -> None:
     sections = m14b.sections_kpmp()
-    tok = m14b.load_tokens(sections.section)
     folds = D.participant_folds(sections, T["n_folds"], cfg["seed"])
     cache, infos = {}, []
     need = [fi for fi in range(len(folds)) if not ("--resume" in sys.argv and (CACHE / f"fold{fi}.pkl").exists())]
     if need:
         data = D.load_cohort(p(cfg["paths"]["interim"]) / "kpmp_spots",
                              p(cfg["paths"]["cache"]) / "img_kpmp", sections.section)
-        for s in sections.section:
-            assert (tok[s][2] == data[s]["table"].index.values).all(), s
     for fi, (tr_all, te) in enumerate(folds):
         f = CACHE / f"fold{fi}.pkl"
         if fi in need:
+            tok = m14b.load_tokens(sections.section, fold=fi)  # projection fitted on this fold's training data
+            for s in sections.section:
+                assert (tok[s][2] == data[s]["table"].index.values).all(), s
             out, info = run_fold(fi, tr_all, te, sections, data, tok)
             pickle.dump((out, info), open(f, "wb"))
             print("fold", fi, info, time.strftime("%H:%M"), flush=True)
