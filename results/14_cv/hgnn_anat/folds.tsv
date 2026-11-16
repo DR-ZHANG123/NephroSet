@@ -1,0 +1,6 @@
+model	fold	chosen	n_train	n_val	n_test
+hgnn_anat	0	7	136	24	41
+hgnn_anat	1	7	137	24	40
+hgnn_anat	2	10	137	24	40
+hgnn_anat	3	4	137	24	40
+hgnn_anat	4	7	137	24	40

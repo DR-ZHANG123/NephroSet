@@ -1,0 +1,6 @@
+model	fold	chosen	n_train	n_val	n_test
+gat	0		136	24	41
+gat	1		137	24	40
+gat	2		137	24	40
+gat	3		137	24	40
+gat	4		137	24	40

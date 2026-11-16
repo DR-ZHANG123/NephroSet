@@ -1,0 +1,6 @@
+model	fold	chosen	n_train	n_val	n_test
+set_anat_nogeom	0	7	136	24	41
+set_anat_nogeom	1	10	137	24	40
+set_anat_nogeom	2	7	137	24	40
+set_anat_nogeom	3	4	137	24	40
+set_anat_nogeom	4	7	137	24	40

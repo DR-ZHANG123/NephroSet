@@ -1,0 +1,6 @@
+model	fold	chosen	n_train	n_val	n_test
+deepsets	0	2	136	24	41
+deepsets	1	2	137	24	40
+deepsets	2	2	137	24	40
+deepsets	3	2	137	24	40
+deepsets	4	2	137	24	40

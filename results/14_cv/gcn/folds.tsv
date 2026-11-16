@@ -1,0 +1,6 @@
+model	fold	chosen	n_train	n_val	n_test
+gcn	0		136	24	41
+gcn	1		137	24	40
+gcn	2		137	24	40
+gcn	3		137	24	40
+gcn	4		137	24	40

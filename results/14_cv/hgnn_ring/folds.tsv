@@ -1,0 +1,6 @@
+model	fold	chosen	n_train	n_val	n_test
+hgnn_ring	0	2	136	24	41
+hgnn_ring	1	1	137	24	40
+hgnn_ring	2	1	137	24	40
+hgnn_ring	3	2	137	24	40
+hgnn_ring	4	1	137	24	40

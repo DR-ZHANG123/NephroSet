@@ -1,0 +1,6 @@
+model	fold	chosen	n_train	n_val	n_test
+set_anat_rewired	0	10	136	24	41
+set_anat_rewired	1	7	137	24	40
+set_anat_rewired	2	4	137	24	40
+set_anat_rewired	3	7	137	24	40
+set_anat_rewired	4	7	137	24	40

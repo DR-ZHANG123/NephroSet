@@ -1,0 +1,13 @@
+/data/
+/logs/
+/figures/*.png
+/figures/*.pdf
+/figures/*.svg
+/scripts/third_party/istar/
+/scripts/third_party/bleep/
+/scripts/third_party/hist2st/
+__pycache__/
+*.pth
+*.npz
+*.h5ad
+*.parquet

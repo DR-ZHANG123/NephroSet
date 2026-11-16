@@ -1,0 +1,6 @@
+model	fold	chosen	n_train	n_val	n_test
+clique_gcn	0	10	136	24	41
+clique_gcn	1	4	137	24	40
+clique_gcn	2	10	137	24	40
+clique_gcn	3	7	137	24	40
+clique_gcn	4	4	137	24	40

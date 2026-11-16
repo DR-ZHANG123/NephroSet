@@ -1,0 +1,6 @@
+model	fold	chosen	n_train	n_val	n_test
+mlp	0		136	24	41
+mlp	1		137	24	40
+mlp	2		137	24	40
+mlp	3		137	24	40
+mlp	4		137	24	40

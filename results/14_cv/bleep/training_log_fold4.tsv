@@ -1,0 +1,3 @@
+fold	seed	best_epoch	val_rho_injury	n_genes	n_train	n_val	n_test
+4	2027	4	0.15430660741749716	3009	137	24	40
+4	2028	5	0.1465171742998536	3009	137	24	40

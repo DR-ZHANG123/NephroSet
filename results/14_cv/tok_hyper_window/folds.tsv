@@ -1,0 +1,6 @@
+model	fold	n_test	n_train	n_val
+tok_hyper_window	0	41		
+tok_hyper_window	1	40		
+tok_hyper_window	2	40		
+tok_hyper_window	3	40	137.0	24.0
+tok_hyper_window	4	40	137.0	24.0

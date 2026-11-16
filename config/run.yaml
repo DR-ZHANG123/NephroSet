@@ -1,0 +1,8 @@
+seed: 2026
+seeds: [2026, 2027, 2028]
+paths:
+  raw: data/raw
+  interim: data/interim
+  cache: data/cache
+# Optional local copies of the public raw files (hardlinked instead of downloaded)
+mirrors: []

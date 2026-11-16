@@ -1,0 +1,841 @@
+model	programme	cohort_metric	value
+gbm_measured_comp	pt_injury	"KPMP
+all"	0.1854626137804033
+gbm_measured_comp	pt_injury	"KPMP
+adj."	0.1259006360559888
+gbm_measured_comp	pt_injury	"2nd
+centre
+all"	0.1357473147576798
+gbm_measured_comp	pt_injury	"2nd
+centre
+adj."	0.0795145242437646
+gbm_comp_morph	pt_injury	"KPMP
+all"	0.1604642510086342
+gbm_comp_morph	pt_injury	"KPMP
+adj."	0.1319094216206244
+gbm_comp_morph	pt_injury	"2nd
+centre
+all"	0.0037744507807982
+gbm_comp_morph	pt_injury	"2nd
+centre
+adj."	-0.010218902514901
+hist2st	pt_injury	"KPMP
+all"	0.0146460193371688
+hist2st	pt_injury	"KPMP
+adj."	0.0222650648768208
+hist2st	pt_injury	"2nd
+centre
+all"	-0.0258649651720626
+hist2st	pt_injury	"2nd
+centre
+adj."	-0.0226875862843225
+bleep	pt_injury	"KPMP
+all"	0.1868173031940513
+bleep	pt_injury	"KPMP
+adj."	0.1625066615610133
+bleep	pt_injury	"2nd
+centre
+all"	-0.030470605650012
+bleep	pt_injury	"2nd
+centre
+adj."	-0.0108113470464585
+istar	pt_injury	"KPMP
+all"	0.1707369369649148
+istar	pt_injury	"KPMP
+adj."	0.1509978216536508
+istar	pt_injury	"2nd
+centre
+all"	0.0482698416546294
+istar	pt_injury	"2nd
+centre
+adj."	0.0352793099547663
+ridge_image	pt_injury	"KPMP
+all"	0.2059181231299853
+ridge_image	pt_injury	"KPMP
+adj."	0.1857959680679936
+ridge_image	pt_injury	"2nd
+centre
+all"	0.1155913061292965
+ridge_image	pt_injury	"2nd
+centre
+adj."	0.0919906057862142
+mlp	pt_injury	"KPMP
+all"	0.2210760698743935
+mlp	pt_injury	"KPMP
+adj."	0.1922961866992532
+mlp	pt_injury	"2nd
+centre
+all"	0.1277174820140053
+mlp	pt_injury	"2nd
+centre
+adj."	0.1092302724354782
+gcn	pt_injury	"KPMP
+all"	0.2121334277341626
+gcn	pt_injury	"KPMP
+adj."	0.183942080115792
+gcn	pt_injury	"2nd
+centre
+all"	0.1270156840867509
+gcn	pt_injury	"2nd
+centre
+adj."	0.0967483970931881
+gat	pt_injury	"KPMP
+all"	0.2174144863434396
+gat	pt_injury	"KPMP
+adj."	0.1883054379223228
+gat	pt_injury	"2nd
+centre
+all"	0.1325161904419984
+gat	pt_injury	"2nd
+centre
+adj."	0.1069562888309412
+clique_gcn	pt_injury	"KPMP
+all"	0.210158919022795
+clique_gcn	pt_injury	"KPMP
+adj."	0.1823019416180823
+clique_gcn	pt_injury	"2nd
+centre
+all"	0.1259284393542551
+clique_gcn	pt_injury	"2nd
+centre
+adj."	0.1000180713306155
+hgnn_ring	pt_injury	"KPMP
+all"	0.2078686261773782
+hgnn_ring	pt_injury	"KPMP
+adj."	0.1809895493344152
+hgnn_ring	pt_injury	"2nd
+centre
+all"	0.1042808490222369
+hgnn_ring	pt_injury	"2nd
+centre
+adj."	0.0793595851561732
+hgnn_anat	pt_injury	"KPMP
+all"	0.212218328568598
+hgnn_anat	pt_injury	"KPMP
+adj."	0.1845508554689827
+hgnn_anat	pt_injury	"2nd
+centre
+all"	0.147631335640308
+hgnn_anat	pt_injury	"2nd
+centre
+adj."	0.1164269039223018
+deepsets	pt_injury	"KPMP
+all"	0.2297233211890634
+deepsets	pt_injury	"KPMP
+adj."	0.2023237713106571
+deepsets	pt_injury	"2nd
+centre
+all"	0.095684083168713
+deepsets	pt_injury	"2nd
+centre
+adj."	0.0869538733254178
+set_ring	pt_injury	"KPMP
+all"	0.2294270293559667
+set_ring	pt_injury	"KPMP
+adj."	0.2004574796343489
+set_ring	pt_injury	"2nd
+centre
+all"	0.0859355108857846
+set_ring	pt_injury	"2nd
+centre
+adj."	0.0875254574360783
+set_anat	pt_injury	"KPMP
+all"	0.2296421424374176
+set_anat	pt_injury	"KPMP
+adj."	0.2001490701597788
+set_anat	pt_injury	"2nd
+centre
+all"	0.0949792768657343
+set_anat	pt_injury	"2nd
+centre
+adj."	0.0933684636093751
+set_anat_rewired	pt_injury	"KPMP
+all"	0.2328982052554401
+set_anat_rewired	pt_injury	"KPMP
+adj."	0.2031165341595718
+set_anat_rewired	pt_injury	"2nd
+centre
+all"	0.081893971133925
+set_anat_rewired	pt_injury	"2nd
+centre
+adj."	0.0841088022754888
+set_anat_noroles	pt_injury	"KPMP
+all"	0.2300612624780668
+set_anat_noroles	pt_injury	"KPMP
+adj."	0.2007519118489329
+set_anat_noroles	pt_injury	"2nd
+centre
+all"	0.0851099137207605
+set_anat_noroles	pt_injury	"2nd
+centre
+adj."	0.0861560914600016
+set_anat_nogeom	pt_injury	"KPMP
+all"	0.2310982819703059
+set_anat_nogeom	pt_injury	"KPMP
+adj."	0.2025017831659964
+set_anat_nogeom	pt_injury	"2nd
+centre
+all"	0.0822125165840815
+set_anat_nogeom	pt_injury	"2nd
+centre
+adj."	0.0856146845630068
+tok_mean	pt_injury	"KPMP
+all"	0.2463375541214935
+tok_mean	pt_injury	"KPMP
+adj."	0.2177021655097157
+tok_mean	pt_injury	"2nd
+centre
+all"	0.0823810723451697
+tok_mean	pt_injury	"2nd
+centre
+adj."	0.0785484638402101
+tok_abmil	pt_injury	"KPMP
+all"	0.2591634843947863
+tok_abmil	pt_injury	"KPMP
+adj."	0.2273548116106918
+tok_abmil	pt_injury	"2nd
+centre
+all"	0.1293803885697994
+tok_abmil	pt_injury	"2nd
+centre
+adj."	0.1128751249322991
+tok_gat	pt_injury	"KPMP
+all"	0.2629712771865932
+tok_gat	pt_injury	"KPMP
+adj."	0.2318214071433872
+tok_gat	pt_injury	"2nd
+centre
+all"	0.1278116091982436
+tok_gat	pt_injury	"2nd
+centre
+adj."	0.1158493261161801
+tok_hyper_window	pt_injury	"KPMP
+all"	0.2641670975327422
+tok_hyper_window	pt_injury	"KPMP
+adj."	0.2335556851429308
+tok_hyper_window	pt_injury	"2nd
+centre
+all"	0.1073669503390105
+tok_hyper_window	pt_injury	"2nd
+centre
+adj."	0.0980558883102728
+tok_hyper_rolebag	pt_injury	"KPMP
+all"	0.2627484581647543
+tok_hyper_rolebag	pt_injury	"KPMP
+adj."	0.2323236064907654
+tok_hyper_rolebag	pt_injury	"2nd
+centre
+all"	0.0838094900543717
+tok_hyper_rolebag	pt_injury	"2nd
+centre
+adj."	0.0802351645886725
+tok_hyper_rewired	pt_injury	"KPMP
+all"	0.2637256745846931
+tok_hyper_rewired	pt_injury	"KPMP
+adj."	0.233157432209857
+tok_hyper_rewired	pt_injury	"2nd
+centre
+all"	0.1021659808995765
+tok_hyper_rewired	pt_injury	"2nd
+centre
+adj."	0.0920786693932329
+tok_hyper_profile	pt_injury	"KPMP
+all"	0.2629601734464986
+tok_hyper_profile	pt_injury	"KPMP
+adj."	0.2329053023894656
+tok_hyper_profile	pt_injury	"2nd
+centre
+all"	0.116333443954847
+tok_hyper_profile	pt_injury	"2nd
+centre
+adj."	0.1051298270176932
+tok_hyper_anat	pt_injury	"KPMP
+all"	0.2588693312173542
+tok_hyper_anat	pt_injury	"KPMP
+adj."	0.2278930069452567
+tok_hyper_anat	pt_injury	"2nd
+centre
+all"	0.1055333765984403
+tok_hyper_anat	pt_injury	"2nd
+centre
+adj."	0.0913263323980478
+tok_hyper_anat_ctx	pt_injury	"KPMP
+all"	0.2658983742197844
+tok_hyper_anat_ctx	pt_injury	"KPMP
+adj."	0.2350197057765078
+tok_hyper_anat_ctx	pt_injury	"2nd
+centre
+all"	0.0786163010954922
+tok_hyper_anat_ctx	pt_injury	"2nd
+centre
+adj."	0.0735393081616093
+tok_abmil_ctx	pt_injury	"KPMP
+all"	0.262499403695314
+tok_abmil_ctx	pt_injury	"KPMP
+adj."	0.2319104969173891
+tok_abmil_ctx	pt_injury	"2nd
+centre
+all"	0.148792170764195
+tok_abmil_ctx	pt_injury	"2nd
+centre
+adj."	0.1234329191460877
+gbm_measured_comp	inflammation	"KPMP
+all"	0.2072745840667283
+gbm_measured_comp	inflammation	"KPMP
+adj."	0.0432588883871926
+gbm_measured_comp	inflammation	"2nd
+centre
+all"	0.2166063807334552
+gbm_measured_comp	inflammation	"2nd
+centre
+adj."	0.0410524074475486
+gbm_comp_morph	inflammation	"KPMP
+all"	0.1748095086309977
+gbm_comp_morph	inflammation	"KPMP
+adj."	0.1105193456469167
+gbm_comp_morph	inflammation	"2nd
+centre
+all"	0.1405031696408986
+gbm_comp_morph	inflammation	"2nd
+centre
+adj."	0.0735075624844718
+hist2st	inflammation	"KPMP
+all"	0.0585524819257692
+hist2st	inflammation	"KPMP
+adj."	0.0502377521238162
+hist2st	inflammation	"2nd
+centre
+all"	0.0108231360794018
+hist2st	inflammation	"2nd
+centre
+adj."	0.0144610386960337
+bleep	inflammation	"KPMP
+all"	0.1671255040486575
+bleep	inflammation	"KPMP
+adj."	0.1067244081355409
+bleep	inflammation	"2nd
+centre
+all"	-0.0280906974634992
+bleep	inflammation	"2nd
+centre
+adj."	-0.0124877013747496
+istar	inflammation	"KPMP
+all"	0.1444032699104418
+istar	inflammation	"KPMP
+adj."	0.0954191801357623
+istar	inflammation	"2nd
+centre
+all"	0.0718728455276027
+istar	inflammation	"2nd
+centre
+adj."	0.034397942062019
+ridge_image	inflammation	"KPMP
+all"	0.1671559057333462
+ridge_image	inflammation	"KPMP
+adj."	0.1150692319533678
+ridge_image	inflammation	"2nd
+centre
+all"	0.1419484449564286
+ridge_image	inflammation	"2nd
+centre
+adj."	0.0853478094342192
+mlp	inflammation	"KPMP
+all"	0.1885888440995956
+mlp	inflammation	"KPMP
+adj."	0.1302380431312501
+mlp	inflammation	"2nd
+centre
+all"	0.1395210011256049
+mlp	inflammation	"2nd
+centre
+adj."	0.0834265494975087
+gcn	inflammation	"KPMP
+all"	0.1788649780042332
+gcn	inflammation	"KPMP
+adj."	0.128914354324227
+gcn	inflammation	"2nd
+centre
+all"	0.1359643061346307
+gcn	inflammation	"2nd
+centre
+adj."	0.0767750731587391
+gat	inflammation	"KPMP
+all"	0.1840163037927292
+gat	inflammation	"KPMP
+adj."	0.1306495471815824
+gat	inflammation	"2nd
+centre
+all"	0.1278049033929156
+gat	inflammation	"2nd
+centre
+adj."	0.0685348974265188
+clique_gcn	inflammation	"KPMP
+all"	0.1783869188356187
+clique_gcn	inflammation	"KPMP
+adj."	0.1303636579939096
+clique_gcn	inflammation	"2nd
+centre
+all"	0.1148336966641361
+clique_gcn	inflammation	"2nd
+centre
+adj."	0.0593017574207669
+hgnn_ring	inflammation	"KPMP
+all"	0.1782523842935754
+hgnn_ring	inflammation	"KPMP
+adj."	0.1291979358979647
+hgnn_ring	inflammation	"2nd
+centre
+all"	0.1133097630191999
+hgnn_ring	inflammation	"2nd
+centre
+adj."	0.0618553891317065
+hgnn_anat	inflammation	"KPMP
+all"	0.1803013744119706
+hgnn_anat	inflammation	"KPMP
+adj."	0.1297241438637685
+hgnn_anat	inflammation	"2nd
+centre
+all"	0.1270613261872634
+hgnn_anat	inflammation	"2nd
+centre
+adj."	0.068539723739315
+deepsets	inflammation	"KPMP
+all"	0.1943910667483043
+deepsets	inflammation	"KPMP
+adj."	0.1372193986500089
+deepsets	inflammation	"2nd
+centre
+all"	0.0952458798914651
+deepsets	inflammation	"2nd
+centre
+adj."	0.0480444936247022
+set_ring	inflammation	"KPMP
+all"	0.1931575090733931
+set_ring	inflammation	"KPMP
+adj."	0.132047472496998
+set_ring	inflammation	"2nd
+centre
+all"	0.1507871879795351
+set_ring	inflammation	"2nd
+centre
+adj."	0.0887151099248122
+set_anat	inflammation	"KPMP
+all"	0.1943356958101843
+set_anat	inflammation	"KPMP
+adj."	0.1331976113383854
+set_anat	inflammation	"2nd
+centre
+all"	0.1501302629196556
+set_anat	inflammation	"2nd
+centre
+adj."	0.0894069153423426
+set_anat_rewired	inflammation	"KPMP
+all"	0.1934859005207586
+set_anat_rewired	inflammation	"KPMP
+adj."	0.131374024036523
+set_anat_rewired	inflammation	"2nd
+centre
+all"	0.1452910945565976
+set_anat_rewired	inflammation	"2nd
+centre
+adj."	0.0851497237088912
+set_anat_noroles	inflammation	"KPMP
+all"	0.1923711644385438
+set_anat_noroles	inflammation	"KPMP
+adj."	0.1315055765706276
+set_anat_noroles	inflammation	"2nd
+centre
+all"	0.1514066178575689
+set_anat_noroles	inflammation	"2nd
+centre
+adj."	0.0898296106909055
+set_anat_nogeom	inflammation	"KPMP
+all"	0.191856384436671
+set_anat_nogeom	inflammation	"KPMP
+adj."	0.1317437084263906
+set_anat_nogeom	inflammation	"2nd
+centre
+all"	0.1433206282489406
+set_anat_nogeom	inflammation	"2nd
+centre
+adj."	0.082142852503045
+tok_mean	inflammation	"KPMP
+all"	0.2119354023543512
+tok_mean	inflammation	"KPMP
+adj."	0.1438393751257698
+tok_mean	inflammation	"2nd
+centre
+all"	0.1339722450376896
+tok_mean	inflammation	"2nd
+centre
+adj."	0.071151929800907
+tok_abmil	inflammation	"KPMP
+all"	0.2169763038254398
+tok_abmil	inflammation	"KPMP
+adj."	0.1471085277317916
+tok_abmil	inflammation	"2nd
+centre
+all"	0.1468311273685066
+tok_abmil	inflammation	"2nd
+centre
+adj."	0.0821983245891844
+tok_gat	inflammation	"KPMP
+all"	0.2218575842498455
+tok_gat	inflammation	"KPMP
+adj."	0.1506747352521002
+tok_gat	inflammation	"2nd
+centre
+all"	0.147532394305834
+tok_gat	inflammation	"2nd
+centre
+adj."	0.081816608003887
+tok_hyper_window	inflammation	"KPMP
+all"	0.2211693410087
+tok_hyper_window	inflammation	"KPMP
+adj."	0.1512421844794863
+tok_hyper_window	inflammation	"2nd
+centre
+all"	0.128993866850395
+tok_hyper_window	inflammation	"2nd
+centre
+adj."	0.0645838282543051
+tok_hyper_rolebag	inflammation	"KPMP
+all"	0.2205043366265501
+tok_hyper_rolebag	inflammation	"KPMP
+adj."	0.1506767353688441
+tok_hyper_rolebag	inflammation	"2nd
+centre
+all"	0.1336227870385123
+tok_hyper_rolebag	inflammation	"2nd
+centre
+adj."	0.0747281599230731
+tok_hyper_rewired	inflammation	"KPMP
+all"	0.2210846868252695
+tok_hyper_rewired	inflammation	"KPMP
+adj."	0.1515133343838626
+tok_hyper_rewired	inflammation	"2nd
+centre
+all"	0.1417516286928921
+tok_hyper_rewired	inflammation	"2nd
+centre
+adj."	0.074746130378563
+tok_hyper_profile	inflammation	"KPMP
+all"	0.2213166270634602
+tok_hyper_profile	inflammation	"KPMP
+adj."	0.1503904193442644
+tok_hyper_profile	inflammation	"2nd
+centre
+all"	0.1473853500946769
+tok_hyper_profile	inflammation	"2nd
+centre
+adj."	0.081266399265879
+tok_hyper_anat	inflammation	"KPMP
+all"	0.218520620913185
+tok_hyper_anat	inflammation	"KPMP
+adj."	0.1480428749109945
+tok_hyper_anat	inflammation	"2nd
+centre
+all"	0.1539144939262853
+tok_hyper_anat	inflammation	"2nd
+centre
+adj."	0.0851634070756398
+tok_hyper_anat_ctx	inflammation	"KPMP
+all"	0.2197411158579067
+tok_hyper_anat_ctx	inflammation	"KPMP
+adj."	0.149663947877185
+tok_hyper_anat_ctx	inflammation	"2nd
+centre
+all"	0.1407770524570893
+tok_hyper_anat_ctx	inflammation	"2nd
+centre
+adj."	0.0722855197624495
+tok_abmil_ctx	inflammation	"KPMP
+all"	0.2224424779815253
+tok_abmil_ctx	inflammation	"KPMP
+adj."	0.1501210435553889
+tok_abmil_ctx	inflammation	"2nd
+centre
+all"	0.1571194039066835
+tok_abmil_ctx	inflammation	"2nd
+centre
+adj."	0.0886970492259438
+gbm_measured_comp	pt_transport	"KPMP
+all"	0.5533643848430756
+gbm_measured_comp	pt_transport	"KPMP
+adj."	0.1577791006794605
+gbm_measured_comp	pt_transport	"2nd
+centre
+all"	0.5674709574953847
+gbm_measured_comp	pt_transport	"2nd
+centre
+adj."	0.094859560887355
+gbm_comp_morph	pt_transport	"KPMP
+all"	0.5805340362182512
+gbm_comp_morph	pt_transport	"KPMP
+adj."	0.4484213093810446
+gbm_comp_morph	pt_transport	"2nd
+centre
+all"	0.2405480663828861
+gbm_comp_morph	pt_transport	"2nd
+centre
+adj."	0.0951525541807364
+hist2st	pt_transport	"KPMP
+all"	0.3533449960256245
+hist2st	pt_transport	"KPMP
+adj."	0.2743679460226435
+hist2st	pt_transport	"2nd
+centre
+all"	0.0126473602609434
+hist2st	pt_transport	"2nd
+centre
+adj."	0.0019813593092257
+bleep	pt_transport	"KPMP
+all"	0.5832428774227444
+bleep	pt_transport	"KPMP
+adj."	0.4519773958022945
+bleep	pt_transport	"2nd
+centre
+all"	0.2334082711317924
+bleep	pt_transport	"2nd
+centre
+adj."	0.1008918997395273
+istar	pt_transport	"KPMP
+all"	0.5763084242000915
+istar	pt_transport	"KPMP
+adj."	0.4446101076779893
+istar	pt_transport	"2nd
+centre
+all"	0.2153586373932574
+istar	pt_transport	"2nd
+centre
+adj."	0.1065033558337907
+ridge_image	pt_transport	"KPMP
+all"	0.5923887677690602
+ridge_image	pt_transport	"KPMP
+adj."	0.4598744495611608
+ridge_image	pt_transport	"2nd
+centre
+all"	0.3425058306415091
+ridge_image	pt_transport	"2nd
+centre
+adj."	0.1736911589596857
+mlp	pt_transport	"KPMP
+all"	0.5953497883045513
+mlp	pt_transport	"KPMP
+adj."	0.4683258903877514
+mlp	pt_transport	"2nd
+centre
+all"	0.4595370658732435
+mlp	pt_transport	"2nd
+centre
+adj."	0.2698549651867735
+gcn	pt_transport	"KPMP
+all"	0.5829063662657715
+gcn	pt_transport	"KPMP
+adj."	0.4554769396357172
+gcn	pt_transport	"2nd
+centre
+all"	0.332055278347483
+gcn	pt_transport	"2nd
+centre
+adj."	0.1416768737658476
+gat	pt_transport	"KPMP
+all"	0.590307741961482
+gat	pt_transport	"KPMP
+adj."	0.4627056560639633
+gat	pt_transport	"2nd
+centre
+all"	0.3842715314069309
+gat	pt_transport	"2nd
+centre
+adj."	0.1853660323013898
+clique_gcn	pt_transport	"KPMP
+all"	0.5838632121279199
+clique_gcn	pt_transport	"KPMP
+adj."	0.4561921394850425
+clique_gcn	pt_transport	"2nd
+centre
+all"	0.3054072184163137
+clique_gcn	pt_transport	"2nd
+centre
+adj."	0.1167527619090249
+hgnn_ring	pt_transport	"KPMP
+all"	0.5804627976483562
+hgnn_ring	pt_transport	"KPMP
+adj."	0.4549286165735609
+hgnn_ring	pt_transport	"2nd
+centre
+all"	0.3169576706923561
+hgnn_ring	pt_transport	"2nd
+centre
+adj."	0.1236566337555055
+hgnn_anat	pt_transport	"KPMP
+all"	0.581305924456909
+hgnn_anat	pt_transport	"KPMP
+adj."	0.4564034756716482
+hgnn_anat	pt_transport	"2nd
+centre
+all"	0.3607795073960916
+hgnn_anat	pt_transport	"2nd
+centre
+adj."	0.1637019796016267
+deepsets	pt_transport	"KPMP
+all"	0.6016978314139669
+deepsets	pt_transport	"KPMP
+adj."	0.4749210602860349
+deepsets	pt_transport	"2nd
+centre
+all"	0.3763785920043848
+deepsets	pt_transport	"2nd
+centre
+adj."	0.1911195732335653
+set_ring	pt_transport	"KPMP
+all"	0.6065408814180778
+set_ring	pt_transport	"KPMP
+adj."	0.4779628637550276
+set_ring	pt_transport	"2nd
+centre
+all"	0.4586331607362179
+set_ring	pt_transport	"2nd
+centre
+adj."	0.2678696873274614
+set_anat	pt_transport	"KPMP
+all"	0.6064838480667086
+set_anat	pt_transport	"KPMP
+adj."	0.4783959057410679
+set_anat	pt_transport	"2nd
+centre
+all"	0.455449753915727
+set_anat	pt_transport	"2nd
+centre
+adj."	0.2622069786403109
+set_anat_rewired	pt_transport	"KPMP
+all"	0.6063250530653393
+set_anat_rewired	pt_transport	"KPMP
+adj."	0.4779861358306225
+set_anat_rewired	pt_transport	"2nd
+centre
+all"	0.4236687933427166
+set_anat_rewired	pt_transport	"2nd
+centre
+adj."	0.2362163796678882
+set_anat_noroles	pt_transport	"KPMP
+all"	0.6050701215369271
+set_anat_noroles	pt_transport	"KPMP
+adj."	0.4764600000449304
+set_anat_noroles	pt_transport	"2nd
+centre
+all"	0.4211009771210021
+set_anat_noroles	pt_transport	"2nd
+centre
+adj."	0.2292976781401516
+set_anat_nogeom	pt_transport	"KPMP
+all"	0.6069512347872789
+set_anat_nogeom	pt_transport	"KPMP
+adj."	0.4772611103611764
+set_anat_nogeom	pt_transport	"2nd
+centre
+all"	0.4505204478723086
+set_anat_nogeom	pt_transport	"2nd
+centre
+adj."	0.2625742966895937
+tok_mean	pt_transport	"KPMP
+all"	0.6203624265599171
+tok_mean	pt_transport	"KPMP
+adj."	0.4924441536848509
+tok_mean	pt_transport	"2nd
+centre
+all"	0.445663915331178
+tok_mean	pt_transport	"2nd
+centre
+adj."	0.2627090905418095
+tok_abmil	pt_transport	"KPMP
+all"	0.6317911243649562
+tok_abmil	pt_transport	"KPMP
+adj."	0.5029173851549661
+tok_abmil	pt_transport	"2nd
+centre
+all"	0.5002419848722091
+tok_abmil	pt_transport	"2nd
+centre
+adj."	0.3132651914138711
+tok_gat	pt_transport	"KPMP
+all"	0.6368113582389109
+tok_gat	pt_transport	"KPMP
+adj."	0.5050412434156571
+tok_gat	pt_transport	"2nd
+centre
+all"	0.4754564901999681
+tok_gat	pt_transport	"2nd
+centre
+adj."	0.276680739932842
+tok_hyper_window	pt_transport	"KPMP
+all"	0.633106629176994
+tok_hyper_window	pt_transport	"KPMP
+adj."	0.5029034630004542
+tok_hyper_window	pt_transport	"2nd
+centre
+all"	0.4611613559312523
+tok_hyper_window	pt_transport	"2nd
+centre
+adj."	0.2659048587556073
+tok_hyper_rolebag	pt_transport	"KPMP
+all"	0.6327952897352951
+tok_hyper_rolebag	pt_transport	"KPMP
+adj."	0.5044902547977126
+tok_hyper_rolebag	pt_transport	"2nd
+centre
+all"	0.4615997904399378
+tok_hyper_rolebag	pt_transport	"2nd
+centre
+adj."	0.2690222990715792
+tok_hyper_rewired	pt_transport	"KPMP
+all"	0.6327375390632201
+tok_hyper_rewired	pt_transport	"KPMP
+adj."	0.5018869762830575
+tok_hyper_rewired	pt_transport	"2nd
+centre
+all"	0.501228656956962
+tok_hyper_rewired	pt_transport	"2nd
+centre
+adj."	0.3071729817790575
+tok_hyper_profile	pt_transport	"KPMP
+all"	0.6314916291716025
+tok_hyper_profile	pt_transport	"KPMP
+adj."	0.502194560406424
+tok_hyper_profile	pt_transport	"2nd
+centre
+all"	0.4926088786646144
+tok_hyper_profile	pt_transport	"2nd
+centre
+adj."	0.3063667078901641
+tok_hyper_anat	pt_transport	"KPMP
+all"	0.6315637501904128
+tok_hyper_anat	pt_transport	"KPMP
+adj."	0.5010819155842596
+tok_hyper_anat	pt_transport	"2nd
+centre
+all"	0.4853460451199642
+tok_hyper_anat	pt_transport	"2nd
+centre
+adj."	0.2964120101318029
+tok_hyper_anat_ctx	pt_transport	"KPMP
+all"	0.6353225401840611
+tok_hyper_anat_ctx	pt_transport	"KPMP
+adj."	0.5049939715653337
+tok_hyper_anat_ctx	pt_transport	"2nd
+centre
+all"	0.4360297323434719
+tok_hyper_anat_ctx	pt_transport	"2nd
+centre
+adj."	0.2413833502895081
+tok_abmil_ctx	pt_transport	"KPMP
+all"	0.6344890905435765
+tok_abmil_ctx	pt_transport	"KPMP
+adj."	0.5046972253056388
+tok_abmil_ctx	pt_transport	"2nd
+centre
+all"	0.4898945635150901
+tok_abmil_ctx	pt_transport	"2nd
+centre
+adj."	0.3056000016940335
