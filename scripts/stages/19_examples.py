@@ -15,7 +15,7 @@ import pandas as pd
 import tifffile
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from lib.evaluate import ext_file  # noqa: E402
+from lib.evaluate import read_ext, ext_file  # noqa: E402
 from lib.repro import load_config, p, stage_dir, write_provenance  # noqa: E402
 
 cfg = load_config()
@@ -65,7 +65,7 @@ def main() -> None:
     em = pd.read_csv(p("results/18_evaluate_external/section_metrics.tsv"), sep="\t")
     e = em[(em.model == m) & (em.programme == "pt_injury")]
     esid = e.iloc[(e.rho - e.rho.median()).abs().argsort().iloc[0]].section
-    pr = pd.read_parquet(ext_file(EXT, m))
+    pr = read_ext(EXT, m)
     pr = pr[pr.section == esid].reset_index().groupby("barcode").mean(numeric_only=True)
     t = pd.read_parquet(p(cfg["paths"]["interim"]) / "gse211785_spots" / f"{esid}.parquet").join(pr, how="inner")
     e2 = thumb(esid, "gse211785", t, "external")

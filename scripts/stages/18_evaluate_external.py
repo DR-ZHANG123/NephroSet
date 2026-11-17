@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from lib.evaluate import ext_file, PROGS, boot_ci, paired, section_metrics  # noqa: E402
+from lib.evaluate import read_ext, ext_file, PROGS, boot_ci, paired, section_metrics  # noqa: E402
 from lib.repro import load_config, p, stage_dir, write_provenance  # noqa: E402
 
 cfg = load_config()
@@ -26,7 +26,7 @@ def main() -> None:
     per, summ = [], []
     models = [m for m in E["models"] if ext_file(EXT, m).exists()]
     for m in models:
-        pr = pd.read_parquet(ext_file(EXT, m)).reset_index()
+        pr = read_ext(EXT, m).reset_index()
         pr = pr.groupby(["section", "barcode"]).mean(numeric_only=True)
         mg = truth.join(pr[[f"pred_{k}" for k in PROGS]], how="inner").reset_index()
         sm = section_metrics(mg, E["pt_rich_min"]).assign(model=m)

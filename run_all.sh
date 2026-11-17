@@ -42,7 +42,7 @@ for m in mlp gcn deepsets set_ring set_anat; do
 for m in ridge_image gbm_comp_morph mlp gcn deepsets set_ring set_anat; do
   run 15_external_${m}_sn results/15_external/${m}_sn/PROVENANCE.json python scripts/stages/15_external.py --secnorm $m; done
 # structure within the spot: 8 um image tokens
-TOK="tok_mean tok_abmil tok_gat tok_hyper_window tok_hyper_rolebag tok_hyper_rewired tok_hyper_profile tok_hyper_anat tok_abmil_ctx tok_hyper_anat_ctx tok_pred_mean"
+TOK="tok_mean tok_abmil tok_gat tok_hyper_window tok_hyper_rolebag tok_hyper_rewired tok_hyper_profile tok_hyper_anat tok_abmil_ctx tok_hyper_anat_ctx tok_pred_mean tok_mean_disc tok_mean_ring tok_abmil_disc tok_abmil_ring tok_abmil_outer32 tok_abmil_ctx_disc"
 run 12b_token_features_kpmp results/12b_token_features_kpmp/PROVENANCE.json python scripts/stages/12b_token_features.py kpmp
 run 12b_token_features_gse211785 results/12b_token_features_gse211785/PROVENANCE.json python scripts/stages/12b_token_features.py gse211785
 # token projection fitted within each cross-validation fold on its training participants
@@ -50,7 +50,8 @@ run 12c_token_fold_projection results/12c_token_fold_projection/PROVENANCE.json 
 for m in $TOK; do run 14_cv_$m results/14_cv/$m/PROVENANCE.json python scripts/stages/14b_train_tokens.py $m; done
 for m in $TOK; do
   run 15_external_${m}_s10 results/15_external/${m}_s10/PROVENANCE.json python scripts/stages/15b_external_tokens.py $m --seeds10; done
-# external predictions with ten seeds (single models vary between seeds at the second centre)
+# external predictions with ten seeds: the first three seeds (as in cross-validation) form the primary
+# ensemble; all ten are used to assess stability over training seeds
 for m in mlp deepsets gcn gat clique_gcn hgnn_ring hgnn_anat set_ring set_anat set_anat_rewired set_anat_noroles set_anat_nogeom; do
   run 15_external_${m}_s10 results/15_external/${m}_s10/PROVENANCE.json python scripts/stages/15_external.py $m --seeds10; done
 for m in ridge_image gbm_comp_morph mlp gcn deepsets set_ring set_anat; do
@@ -80,9 +81,11 @@ run 18_evaluate_external results/18_evaluate_external/PROVENANCE.json python scr
 run 18b_external_reliability results/18b_external_reliability/PROVENANCE.json python scripts/stages/18b_external_reliability.py
 run 18c_external_region_coverage results/18c_external_region_coverage/PROVENANCE.json python scripts/stages/18c_external_region_coverage.py
 run 18d_external_donors results/18d_external_donors/PROVENANCE.json python scripts/stages/18d_external_donors.py
+run 18e_external_tissue results/18e_external_tissue/PROVENANCE.json python scripts/stages/18e_external_tissue.py
 run 19_examples results/19_examples/PROVENANCE.json python scripts/stages/19_examples.py
 run 20_subgroups results/20_subgroups/PROVENANCE.json python scripts/stages/20_subgroups.py
 run 21_tables results/21_tables/PROVENANCE.json python scripts/stages/21_tables.py
 run 21b_model_cost results/21b_model_cost/PROVENANCE.json python scripts/stages/21b_model_cost.py
-# figures from result tables
+# figures from result tables, then manuscript build with checks
 (cd scripts/figures && for f in Fig*.py; do python "$f"; done)
+python scripts/build_manuscript.py

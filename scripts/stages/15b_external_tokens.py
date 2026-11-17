@@ -65,6 +65,7 @@ def main() -> None:
     ymu, ysd = yy.mean(0), yy.std(0) + 1e-6
     troles = m14b.role_heads(tok, kd, tr, va + ext, cfg["seed"])
     preds = {n: [] for n in names}
+    vpreds = {n: [] for n in names}
     for seed in cfg["seeds"]:
         gr = np.random.default_rng(seed)
         G = {}
@@ -76,18 +77,20 @@ def main() -> None:
                                                  G[tr[0]]["x"].shape[1])
             model.eval()
             with torch.no_grad():
-                for s in ext:
+                for s in ext + va:  # KPMP validation participants: calibration set for intervals (18c)
                     yp, _ = model(G[s])
                     df = pd.DataFrame(yp.cpu().numpy() * ysd + ymu, columns=[f"pred_{c[2:]}" for c in D.PROGS],
-                                      index=xd[s]["table"].index)
+                                      index=allx[s]["table"].index)
                     df["section"], df["seed"] = s, seed
-                    preds[name].append(df)
+                    (preds[name] if s in ext else vpreds[name]).append(df)
             print(name, seed, round(val, 3), ep, flush=True)
             del model
             torch.cuda.empty_cache()
         del G
     for name in names:
         pd.concat(preds[name]).to_parquet(OUT / f"{name}{'_s10' if S10 else ''}.parquet")
+        (OUT / "validation").mkdir(exist_ok=True)
+        pd.concat(vpreds[name]).to_parquet(OUT / "validation" / f"{name}{'_s10' if S10 else ''}.parquet")
         S = stage_dir(f"15_external/{name}{'_s10' if S10 else ''}")
         (S / "done.json").write_text('{"done": true}')
         write_provenance(f"15_external/{name}", cfg, [], [S / "done.json"], extra={"model": name})

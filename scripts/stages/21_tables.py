@@ -59,6 +59,8 @@ def main() -> None:
         .groupby(["cls"]).r.agg(["mean", "std", "count"]).reset_index(),
         "Table S6 external": ex,
         "Table S6b external contrasts": pd.read_csv(p("results/18_evaluate_external/contrasts.tsv"), sep="\t"),
+        "Table S6c external tissue": pd.read_csv(p("results/18e_external_tissue/summary.tsv"), sep="\t")
+        .merge(pd.read_csv(p("results/18e_external_tissue/spots_kept.tsv"), sep="\t"), on="filter"),
         "Table S7 reliability regions": pd.concat([
             pd.read_csv(p("results/16b_reliability_region/summary.tsv"), sep="\t").assign(cohort="KPMP"),
             pd.read_csv(p("results/18b_external_reliability/ceiling.tsv"), sep="\t").assign(cohort="External ceiling"),
@@ -66,7 +68,9 @@ def main() -> None:
         "Table S8 subgroups coverage": pd.concat([
             pd.read_csv(p("results/20_subgroups/subgroups.tsv"), sep="\t"),
             pd.read_csv(p("results/18c_external_region_coverage/coverage.tsv"), sep="\t").assign(grouping="coverage"),
-            pd.read_csv(p("results/17_confidence/conformal_cv.tsv"), sep="\t").assign(grouping="coverage KPMP folds")]),
+            pd.read_csv(p("results/17_confidence/conformal_cv.tsv"), sep="\t").assign(grouping="coverage KPMP folds"),
+            pd.read_csv(p("results/18c_external_region_coverage/coverage_sections.tsv"), sep="\t")
+            .assign(grouping="coverage per external donor")]),
         "Table S9 composition models": pd.read_csv(p("results/16f_adjustment_sensitivity/summary.tsv"), sep="\t"),
         "Table S9b composition contrasts": pd.read_csv(p("results/16f_adjustment_sensitivity/contrasts.tsv"), sep="\t"),
         "Table S10 reliability": pd.read_csv(p("results/16g_reliability_sensitivity/summary.tsv"), sep="\t"),
@@ -92,13 +96,14 @@ def main() -> None:
             "Token roles: within-section correlation of spot-mean token roles with measured composition, held-out participants",
             "External cohort: agreement for every model, programme and metric",
             "External cohort: paired model differences by donor",
+            "External cohort: NephroSet and spot-only network after removing spots or sections with little tissue in the image, and without the donors shared with the single-cell atlas",
             "Split-half reliability and regional agreement, both cohorts",
             "Agreement by diagnosis and tissue source; interval coverage",
             "Agreement beyond composition under alternative composition models and in PT-rich spots",
             "Paired differences of NephroSet from reference models under each composition model",
             "Split-half reliability of measured scores under alternative splits and estimators",
             "Second centre: agreement of each model for every donor, with measured spread and diagnosis",
-            "Second centre: donor-mean agreement of single seeds and of seed ensembles",
+            "Second centre: donor-mean agreement of single seeds and of seed ensembles, including a repeated training run of NephroSet",
             "Trainable parameters, inference time and training cost of each model"][:len(sheets)]})
         # number the sheets in the order in which the tables are first cited in the text
         renum = {4: 6, 5: 7, 6: 9, 7: 10, 8: 12, 9: 5, 10: 4, 11: 11, 12: 8}

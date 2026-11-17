@@ -281,11 +281,20 @@ class TokenNet(nn.Module):
           gat (pairwise attention on the 8-neighbour token grid, then attention pooling),
           hyper (hypergraph layers on the hyperedge family `fam`, then attention pooling).
     ctx:  also aggregate the spot embeddings of lattice neighbours as in NephroSet.
+    region: restrict pooling to tokens inside the 55 um capture spot ("disc", 32 tokens), to the
+          tokens of the crop outside it ("ring", 164 tokens) or to the 32 outermost tokens ("outer32").
     """
 
-    def __init__(self, d_in, d=256, p=0.2, mode="abmil", fam=None, ctx=False, dt=128, **_):
+    def __init__(self, d_in, d=256, p=0.2, mode="abmil", fam=None, ctx=False, dt=128, region=None, **_):
         super().__init__()
-        self.mode, self.fam, self.ctx = mode, fam, ctx
+        self.mode, self.fam, self.ctx, self.region = mode, fam, ctx, region
+        if region is not None:
+            ar = torch.arange(196)
+            r, c = torch.div(ar, 14, rounding_mode="floor"), ar % 14
+            dist = torch.hypot((r - 6.5) * 8.0, (c - 6.5) * 8.0)
+            keep = {"disc": dist <= 27.5, "ring": dist > 27.5,
+                    "outer32": dist >= dist.sort().values[-32]}[region]
+            self.register_buffer("rmask", keep.float(), persistent=False)
         self.stem = Stem(d_in, d, p)
         self.tstem = nn.Sequential(nn.LayerNorm(D_TOK + 2), nn.Linear(D_TOK + 2, dt), nn.GELU(), nn.Dropout(p))
         if mode == "gat":
@@ -333,11 +342,17 @@ class TokenNet(nn.Module):
                 t = ck(layer, t, pos, g[f"t_{f}_node"], g[f"t_{f}_he"], g[f"t_{f}_n"], g[f"t_{f}_type"])
         t = t.view(n, nt, -1)
         w = g["tmask"].view(n, nt)
+        if self.region is not None:
+            w = w * self.rmask[None, :]
         if self.mode == "mean":
             return (t * w[..., None]).sum(1) / w.sum(1, keepdim=True).clamp(min=1)
         s = self.att_w(torch.tanh(self.att_v(t)) * torch.sigmoid(self.att_u(t))).squeeze(-1)
         s = s.masked_fill(w < 0.5, -1e4)
-        return (torch.softmax(s, 1)[..., None] * t).sum(1)
+        a = torch.softmax(s, 1)
+        if self.region is not None:  # spots without tissue tokens in the region get a zero summary
+            a = a * w
+            a = a / a.sum(1, keepdim=True).clamp(min=1e-8)
+        return (a[..., None] * t).sum(1)
 
     def forward(self, g):
         h = self.stem(g["x"])
@@ -387,5 +402,11 @@ TOKEN_REGISTRY = {
     "tok_hyper_anat": (TokenNet, {"mode": "hyper", "fam": "anat"}),
     "tok_abmil_ctx": (TokenNet, {"mode": "abmil", "ctx": True}),
     "tok_hyper_anat_ctx": (TokenNet, {"mode": "hyper", "fam": "anat", "ctx": True}),
+    "tok_mean_disc": (TokenNet, {"mode": "mean", "region": "disc"}),
+    "tok_mean_ring": (TokenNet, {"mode": "mean", "region": "ring"}),
+    "tok_abmil_disc": (TokenNet, {"mode": "abmil", "region": "disc"}),
+    "tok_abmil_ring": (TokenNet, {"mode": "abmil", "region": "ring"}),
+    "tok_abmil_outer32": (TokenNet, {"mode": "abmil", "region": "outer32"}),
+    "tok_abmil_ctx_disc": (TokenNet, {"mode": "abmil", "ctx": True, "region": "disc"}),
 }
 REGISTRY.update(TOKEN_REGISTRY)

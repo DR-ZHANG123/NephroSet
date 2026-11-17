@@ -98,6 +98,7 @@ def sections_kpmp():
 
 
 def main() -> None:
+    (OUTC / "validation").mkdir(exist_ok=True)
     names = [a for a in sys.argv[1:] if not a.startswith("--")]
     from lib.models import REGISTRY
     fams = {REGISTRY[n][1].get("fam") for n in names} - {None}
@@ -125,6 +126,7 @@ def main() -> None:
         ymu, ysd = yy.mean(0), yy.std(0) + 1e-6
         troles = role_heads(tok, data, tr, va + te, cfg["seed"] + fi)
         preds = {n: [] for n in names}
+        vpreds = {n: [] for n in names}
         for seed in cfg["seeds"]:
             gr = np.random.default_rng(seed)
             G = {}
@@ -137,7 +139,7 @@ def main() -> None:
                 log.append(dict(model=name, fold=fi, seed=seed, val_rho=val, epochs=ep))
                 model.eval()
                 with torch.no_grad():
-                    for s in te:
+                    for s in te + va:  # validation participants: calibration set for intervals (17)
                         yp, lc = model(G[s])
                         yp = yp.cpu().numpy() * ysd + ymu
                         t = data[s]["table"]
@@ -146,13 +148,14 @@ def main() -> None:
                         for j, c in enumerate(D.COMP):
                             df[f"predc_{c[5:]}"] = cp[:, j]
                         df["section"], df["seed"], df["fold"] = s, seed, fi
-                        preds[name].append(df)
+                        (preds[name] if s in te else vpreds[name]).append(df)
                 print(name, fi, seed, round(val, 3), ep, time.strftime("%H:%M"), flush=True)
                 del model
                 torch.cuda.empty_cache()
             del G
         for name in names:
             pd.concat(preds[name]).to_parquet(OUTC / f"{name}_fold{fi}.parquet")
+            pd.concat(vpreds[name]).to_parquet(OUTC / "validation" / f"{name}_fold{fi}.parquet")
             rows[name][-1].update(n_train=len(tr), n_val=len(va))
     for name in names:
         S = stage_dir(f"14_cv/{name}")

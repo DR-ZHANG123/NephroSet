@@ -29,6 +29,8 @@ def hforest(ax, d, order, col):
 def main() -> None:
     sg = pd.read_csv(R / "20_subgroups" / "subgroups.tsv", sep="\t")
     cov = pd.read_csv(R / "18c_external_region_coverage" / "coverage.tsv", sep="\t")
+    cvp = pd.read_csv(R / "17_confidence" / "conformal_cv_participants.tsv", sep="\t")
+    exs = pd.read_csv(R / "18c_external_region_coverage" / "coverage_sections.tsv", sep="\t")
     cur = pd.read_csv(R / "17_confidence" / "retained_curves.tsv", sep="\t")
     fig = plt.figure(figsize=(W2, 3.4))
     gs = fig.add_gridspec(2, 3, width_ratios=[1.25, 0.85, 0.85], height_ratios=[1.6, 1], hspace=0.75, wspace=0.55,
@@ -52,16 +54,22 @@ def main() -> None:
     rows = []
     for i, (k, lab) in enumerate(PROG_LAB.items()):
         q = cov[cov.programme == k].iloc[0]
-        ax.bar(i - 0.17, q.kpmp_coverage, width=0.32, color=PAL["anatomy"], alpha=0.85)
+        kp = cvp[cvp.programme == k].coverage
+        ax.bar(i - 0.17, kp.mean(), width=0.32, color=PAL["anatomy"], alpha=0.85)
         ax.bar(i + 0.17, q.external_coverage, width=0.32, color=PAL["ref"], alpha=0.85)
         ax.errorbar(i + 0.17, q.external_coverage, yerr=[[q.external_coverage - q.lo], [q.hi - q.external_coverage]],
                     fmt="none", ecolor="k", lw=0.7)
+        ev = exs[exs.programme == k].coverage.values
+        jit = np.linspace(-0.09, 0.09, len(ev))
+        ax.scatter(i + 0.17 + jit, ev, s=3, color="k", alpha=0.6, lw=0, zorder=3)
+        q = q.copy()
+        q["kpmp_coverage_participant_mean"] = kp.mean()
         rows.append(q.to_dict())
     ln = ax.axhline(0.9, c="k", lw=0.7, ls=(0, (3, 2)))
     ln._is_reference = True
     ax.set_xticks(range(3))
     ax.set_xticklabels(["PT\ninjury", "Inflam-\nmation", "PT\ntransport"])
-    ax.set_ylabel("Share of spots inside the interval")
+    ax.set_ylabel("Coverage per participant")
     ax.set_ylim(0.4, 1.08)
     ax.set_title("Conformal 90% intervals", pad=3)
     ax.legend(handles=[plt.Rectangle((0, 0), 1, 1, color=PAL["anatomy"], alpha=0.85, label="KPMP (held out)"),

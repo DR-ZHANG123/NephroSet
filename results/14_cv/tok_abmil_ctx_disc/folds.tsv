@@ -1,0 +1,6 @@
+model	fold	n_test	n_train	n_val
+tok_abmil_ctx_disc	0	41	136	24
+tok_abmil_ctx_disc	1	40	137	24
+tok_abmil_ctx_disc	2	40	137	24
+tok_abmil_ctx_disc	3	40	137	24
+tok_abmil_ctx_disc	4	40	137	24

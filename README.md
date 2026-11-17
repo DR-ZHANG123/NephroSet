@@ -1,12 +1,14 @@
 # NephroSet
 
 Code, parameters, result tables and figure source data for the article
-"NephroSet estimates proximal tubule injury programmes beyond tissue composition from routine kidney histology:
-development and external validation with spatial transcriptomics".
+"Fine-scale histology within each spatial transcriptomics spot predicts proximal tubule programmes beyond tissue
+composition: development and external validation of NephroSet".
 
 NephroSet estimates three proximal tubule (PT) programmes (injury, inflammation, transport) for every Visium spot
-from the haematoxylin and eosin (H&E) image alone. It reads the 8 µm Phikon-v2 image tokens inside each spot with
-gated attention pooling and the neighbouring spots as an unordered set.
+from the haematoxylin and eosin (H&E) image alone. It reads the 8 µm Phikon-v2 image tokens of the 112 µm crop
+centred on each spot with gated attention pooling, and the neighbouring spots as an unordered set. Models restricted
+to the tokens inside the 55 µm capture spot, around it or at the edge of the crop (`tok_*_disc`, `tok_*_ring`,
+`tok_abmil_outer32`) locate where the information lies.
 
 ## Layout
 - `config/run.yaml`: every analysis parameter (programme gene sets, folds, seeds, model settings).
@@ -19,7 +21,11 @@ gated attention pooling and the neighbouring spots as an unordered set.
     BLEEP retrained on the same participants and targets; `14f` and `tok_pred_mean` apply the prediction rules
     of BLEEP and iStar to the shared image encoder).
   - `16`–`21`: evaluation, split-half reliability (with alternative definitions), alternative composition
-    adjustments, token attention, confidence, results by external donor and seed, subgroups, tables and model cost.
+    adjustments, token attention, confidence, results by external donor and seed, external tissue coverage and
+    donor overlap (`18e`), subgroups, tables and model cost.
+  - External results use the ensemble of the same three seeds as cross-validation; ten seeds are trained to
+    assess stability. Training on GPUs is not bit-reproducible, so repeated runs give slightly different models.
+  - Split-conformal intervals are calibrated on validation participants that were not used to fit the models.
 - `scripts/lib/`: data handling, models, evaluation and the published-method adapters.
 - `scripts/figures/`: plotting only; reads `figures/source_data/`.
 - `results/`, `figures/source_data/`: the tables behind every number and figure in the article.

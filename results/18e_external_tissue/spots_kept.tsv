@@ -1,0 +1,6 @@
+filter	n_spots	n_sections	frac_spots
+all spots	35130	13	1.0
+spots with image tissue >= 0.5	33314	13	0.9483062909194421
+sections with >= 85% spots on tissue	27026	9	0.769313976658127
+both	26482	9	0.7538286364930259
+donors not in the single-cell atlas	26220	9	0.7463706233988044

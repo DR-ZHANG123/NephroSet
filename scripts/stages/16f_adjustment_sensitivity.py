@@ -30,7 +30,7 @@ from sklearn.model_selection import KFold
 from sklearn.preprocessing import PolynomialFeatures
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from lib.evaluate import COMP, PROGS, boot_ci, ext_file, paired  # noqa: E402
+from lib.evaluate import COMP, PROGS, boot_ci, ext_file, paired, read_ext  # noqa: E402
 from lib.repro import load_config, p, stage_dir, write_provenance  # noqa: E402
 
 cfg = load_config()
@@ -116,7 +116,7 @@ def load_preds(cohort: str) -> dict:
             f = ext_file(CACHE / "external_predictions", m)
             if not f.exists():
                 continue
-            pr = pd.read_parquet(f)
+            pr = read_ext(CACHE / "external_predictions", m)
         pr = pr.reset_index().groupby(["section", "barcode"]).mean(numeric_only=True)
         out[m] = {s: g.droplevel(0) for s, g in pr.groupby(level=0)}
     return out

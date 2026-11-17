@@ -5,7 +5,8 @@ Disagreement is their standard deviation. Image novelty is the Mahalanobis dista
 spot's encoder features (first principal components fitted on the fold's training sections)
 from the training distribution. For both scores we report how agreement with the measured
 programme changes as the least certain spots are set aside, within each participant, and
-the coverage of intervals calibrated on validation participants.
+the coverage of intervals calibrated on the validation participants of each fold, which were
+held out from model fitting and used only to stop training.
 """
 from __future__ import annotations
 
@@ -91,20 +92,32 @@ def main() -> None:
             rel.append(dict(programme=prog, score=score, mean_rho_error=r.mean(), frac_positive=(r > 0).mean(),
                             n=len(r)))
     pd.DataFrame(rel).to_csv(S / "error_vs_score.tsv", sep="\t", index=False)
-    # split-conformal intervals scaled by disagreement, calibrated per fold on the other folds
-    cov = []
-    for prog in ["pt_injury"]:
-        sdc = f"sd_{prog}"
-        for fi in sorted(T.fold.unique()):
-            cal = T[T.fold != fi]
-            te = T[T.fold == fi]
-            sc_cal = np.abs(cal[f"y_{prog}"] - cal[f"pred_{prog}"]) / (cal[sdc] + C["sd_floor"])
-            q = np.quantile(sc_cal, 1 - C["alpha"])
+    # split-conformal intervals scaled by disagreement: for each fold, the quantile of scaled residuals
+    # over that fold's validation participants (not used to fit the fold's models) is applied to the
+    # fold's test participants. Coverage is reported over spots and per participant.
+    ytab = {s: data[s]["table"] for s in secs}
+    cov, per = [], []
+    for fi in sorted(T.fold.unique()):
+        va = pd.read_parquet(CV / "validation" / f"{m}_fold{fi}.parquet").reset_index()
+        va = va.groupby(["section", "barcode"])[cols].agg(["mean", "std"])
+        va.columns = [f"{a}" if b == "mean" else f"sd_{a[5:]}" for a, b in va.columns]
+        ys = pd.concat([ytab[s].assign(section=s).reset_index() for s in va.index.get_level_values(0).unique()])
+        va = ys.set_index(["section", "barcode"]).join(va, how="inner")
+        te = T[T.fold == fi]
+        for prog in ["pt_injury", "inflammation", "pt_transport"]:
+            sdc = f"sd_{prog}"
+            sc = np.abs(va[f"y_{prog}"] - va[f"pred_{prog}"]) / (va[sdc] + C["sd_floor"])
+            q = np.quantile(sc, np.ceil((len(sc) + 1) * (1 - C["alpha"])) / len(sc))
             half = q * (te[sdc] + C["sd_floor"])
             inside = np.abs(te[f"y_{prog}"] - te[f"pred_{prog}"]) <= half
+            pp = inside.groupby(te.participant).mean()
             cov.append(dict(programme=prog, fold=fi, nominal=1 - C["alpha"], coverage=inside.mean(),
-                            median_half_width=half.median(), q=q))
+                            participant_median=pp.median(), participant_q25=pp.quantile(0.25),
+                            participant_min=pp.min(), frac_participants_ge80=(pp >= 0.8).mean(),
+                            n_cal_spots=len(sc), median_half_width=half.median(), q=q))
+            per.append(pd.DataFrame(dict(programme=prog, fold=fi, participant=pp.index, coverage=pp.values)))
     pd.DataFrame(cov).to_csv(S / "conformal_cv.tsv", sep="\t", index=False)
+    pd.concat(per).to_csv(S / "conformal_cv_participants.tsv", sep="\t", index=False)
     keep = ["section", "barcode", "participant", "fold", "novelty", "array_row", "array_col",
             "pxl_row_in_fullres", "pxl_col_in_fullres"] + \
         [c for c in T.columns if c.startswith(("y_", "pred_", "sd_", "comp_", "abs_err_"))]

@@ -17,7 +17,7 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from lib.evaluate import PROGS, ext_file, section_metrics  # noqa: E402
+from lib.evaluate import PROGS, ext_file, read_ext, section_metrics  # noqa: E402
 from lib.repro import load_config, p, stage_dir, write_provenance  # noqa: E402
 
 cfg = load_config()
@@ -43,7 +43,7 @@ def main() -> None:
     for m in MODELS:
         f = ext_file(EXT, m)
         if f.exists():
-            rows.append(metrics(truth, pd.read_parquet(f)).assign(model=m))
+            rows.append(metrics(truth, read_ext(EXT, m)).assign(model=m))
     D = pd.concat(rows)
     wide = D.pivot_table(index=["section", "programme"], columns="model", values="rho").add_prefix("rho_")
     adj = D[D.model == "tok_abmil_ctx"].set_index(["section", "programme"])[["rho_beyond_comp", "n_spots"]] \
@@ -52,7 +52,9 @@ def main() -> None:
     out["sd_measured"] = [sd.loc[s, f"y_{k}"] for s, k in zip(out.section, out.programme)]
     out.to_csv(S / "donor_metrics.tsv", sep="\t", index=False)
     stab = []
-    for m in ["mlp", "tok_abmil", "tok_abmil_ctx", "tok_hyper_anat_ctx", "deepsets", "tok_pred_mean"]:
+    # tok_abmil_ctx_repeat: an identical second training run of NephroSet (same code, seeds and data);
+    # GPU scatter operations are not bit-reproducible, so it measures run-to-run variation
+    for m in ["mlp", "tok_abmil", "tok_abmil_ctx", "tok_abmil_ctx_repeat", "tok_hyper_anat_ctx", "deepsets", "tok_pred_mean"]:
         f = EXT / f"{m}_s10.parquet"
         if not f.exists():
             continue

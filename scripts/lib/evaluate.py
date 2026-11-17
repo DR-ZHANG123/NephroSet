@@ -4,10 +4,23 @@ from __future__ import annotations
 from pathlib import Path as _Path
 
 
+PRIMARY_SEEDS = (2026, 2027, 2028)  # the three training seeds of cross-validation
+
+
 def ext_file(ext_dir: _Path, model: str) -> _Path:
-    """External predictions: the ten-seed ensemble when it exists, otherwise the three-seed one."""
+    """External prediction file: the ten-seed run when it exists, otherwise the three-seed run."""
     f = ext_dir / f"{model}_s10.parquet"
     return f if f.exists() else ext_dir / f"{model}.parquet"
+
+
+def read_ext(ext_dir: _Path, model: str, all_seeds: bool = False):
+    """External predictions of one model. The primary result is the ensemble of the same three
+    seeds as in cross-validation; all_seeds=True returns every available seed (sensitivity)."""
+    import pandas as _pd
+    pr = _pd.read_parquet(ext_file(ext_dir, model))
+    if not all_seeds and "seed" in pr.columns and pr.seed.isin(PRIMARY_SEEDS).any():
+        pr = pr[pr.seed.isin(PRIMARY_SEEDS)]  # deterministic references carry a single seed 0
+    return pr
 
 import numpy as np
 import pandas as pd

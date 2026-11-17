@@ -100,7 +100,8 @@ evaluate:
            ridge_image_sn, gbm_comp_morph_sn, mlp_sn, deepsets_sn, gcn_sn, set_ring_sn, set_anat_sn,
            tok_mean, tok_abmil, tok_gat, tok_hyper_window, tok_hyper_rolebag, tok_hyper_rewired,
            tok_hyper_profile, tok_hyper_anat, tok_abmil_ctx, tok_hyper_anat_ctx, istar, bleep, hist2st,
-           knn_encoder, tok_pred_mean]
+           knn_encoder, tok_pred_mean, tok_mean_disc, tok_mean_ring, tok_abmil_disc, tok_abmil_ring,
+           tok_abmil_outer32, tok_abmil_ctx_disc]
   contrasts:
     - [mlp, ridge_image]
     - [mlp, gbm_comp_morph]
@@ -155,6 +156,17 @@ evaluate:
     - [tok_abmil_ctx, tok_pred_mean]
     - [knn_encoder, bleep]
     - [tok_pred_mean, istar]
+    - [tok_abmil, tok_mean]
+    - [tok_abmil_disc, mlp]
+    - [tok_abmil_ring, mlp]
+    - [tok_abmil_outer32, mlp]
+    - [tok_mean_disc, mlp]
+    - [tok_mean_ring, mlp]
+    - [tok_abmil_disc, tok_abmil_ring]
+    - [tok_abmil_disc, tok_abmil_outer32]
+    - [tok_mean_disc, tok_mean_ring]
+    - [tok_abmil, tok_abmil_disc]
+    - [tok_abmil_ctx, tok_abmil_ctx_disc]
 confidence:
   model: tok_abmil_ctx
   n_pcs: 20

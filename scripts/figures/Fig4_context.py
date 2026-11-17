@@ -48,9 +48,9 @@ def forest(ax, pm, items, ref, rng, metric="rho"):
     return rows
 
 
-SCALE = [("deepsets", "mlp", "Between spots\n(neighbourhood set)"),
-         ("tok_abmil", "mlp", "Within the spot\n(token attention)"),
-         ("tok_hyper_anat", "tok_abmil", "Anatomical prior\n(token hypergraph)")]
+SCALE = [("deepsets", "mlp", "Between\nspots"),
+         ("tok_abmil", "mlp", "Token\nresolution"),
+         ("tok_hyper_anat", "tok_abmil", "Anatomical\nprior")]
 LADDER = ["ridge_image", "mlp", "deepsets", "tok_abmil", "tok_abmil_ctx"]
 LAD_LAB = {"ridge_image": "Linear\nprobe", "mlp": "Spot\nonly", "deepsets": "Neighbour-\nhood set",
            "tok_abmil": "Token\nattention", "tok_abmil_ctx": "Nephro-\nSet"}
@@ -80,8 +80,9 @@ def scale_panel(ax):
     hl += [Line2D([], [], marker="o", ls="", ms=3, color="0.3", label="PT injury"),
            Line2D([], [], marker="o", ls="", ms=3, color="0.3", mfc="white", label="PT transport")]
     lo = min(r["lo"] for r in rows)
-    ax.set_ylim(lo - 0.01, 0.1)
-    ax.legend(handles=hl, loc="upper left", fontsize=5.2, ncol=4, columnspacing=0.9, handletextpad=0.2,
+    hi = max(r["hi"] for r in rows)
+    ax.set_ylim(lo - 0.01, hi + 0.075)
+    ax.legend(handles=hl, loc="upper left", fontsize=5.2, ncol=2, columnspacing=0.9, handletextpad=0.2,
               borderaxespad=0.2)
     return pd.DataFrame(rows)
 
@@ -109,6 +110,32 @@ def ladder_panel(ax):
     return pd.DataFrame(rows)
 
 
+REGION = [("tok_mean_disc", "Inside, mean (32)"), ("tok_abmil_disc", "Inside, attention (32)"),
+          ("tok_mean_ring", "Around, mean (164)"), ("tok_abmil_ring", "Around, attention (164)"),
+          ("tok_abmil_outer32", "Outermost, attention (32)"), ("tok_mean", "All, mean (196)"),
+          ("tok_abmil", "All, attention (196)")]
+
+
+def crop_schematic(ax):
+    """112 um crop, 14 x 14 tokens of 8 um, and the 55 um capture spot."""
+    r, c = np.divmod(np.arange(196), 14)
+    d = np.hypot((r - 6.5) * 8, (c - 6.5) * 8)
+    outer = d >= np.sort(d)[-32]
+    for i in range(196):
+        col = PAL["anatomy"] if d[i] <= 27.5 else (PAL["ref"] if outer[i] else "0.88")
+        ax.add_patch(plt.Rectangle((c[i] * 8 - 56, 56 - (r[i] + 1) * 8), 7.4, 7.4, color=col, lw=0))
+    ax.add_patch(plt.Circle((0, 0), 27.5, fill=False, lw=0.9, ec="k"))
+    ax.set_xlim(-57, 57)
+    ax.set_ylim(-57, 57)
+    ax.set_aspect("equal")
+    ax.set_xticks([])
+    ax.set_yticks([])
+    for sp in ax.spines.values():
+        sp.set_visible(False)
+    ax.set_title("112 µm crop,\n55 µm spot", pad=2, fontsize=5.6)
+    return pd.DataFrame(dict(token=np.arange(196), row=r, col=c, dist_um=d, inside=d <= 27.5, outermost32=outer))
+
+
 def main() -> None:
     pm = pd.read_csv(R / "16_evaluate_cv" / "participant_metrics.tsv", sep="\t")
     rng = np.random.default_rng(2026)
@@ -118,7 +145,7 @@ def main() -> None:
     out = {}
     for j, (items, ref, xlab, title, xl, key) in enumerate([
             (BETWEEN, "mlp", "Δ ρ vs spot only", "Context between spots", (-0.03, 0.05), "a_between"),
-            (WITHIN, "mlp", "Δ ρ vs spot only", "Structure within the spot", (-0.03, 0.05), "b_within"),
+            (WITHIN, "mlp", "Δ ρ vs spot only", "Token resolution", (-0.03, 0.05), "b_within"),
             (ABL, "tok_hyper_anat", "Δ ρ vs anatomical\ntoken hypergraph", "Other hyperedges", (-0.015, 0.016),
              "c_hyperedges")]):
         ax = fig.add_subplot(gs[j])
@@ -132,13 +159,20 @@ def main() -> None:
             fig.legend(handles=hl, loc="upper center", bbox_to_anchor=(0.56, 0.995), ncol=3, fontsize=5.6,
                        handletextpad=0.1, columnspacing=1.2, frameon=False)
         label(ax, "abc"[j])
-    bot = outer[1].subgridspec(1, 2, width_ratios=[1.2, 1.15], wspace=0.3)
+    bot = outer[1].subgridspec(1, 3, width_ratios=[1.1, 0.3, 0.62], wspace=0.95)
     ax = fig.add_subplot(bot[0])
     out["d_scale"] = scale_panel(ax)
     label(ax, "d")
     ax = fig.add_subplot(bot[1])
-    out["e_ladder"] = ladder_panel(ax)
+    out["e_crop"] = crop_schematic(ax)
     label(ax, "e")
+    ax = fig.add_subplot(bot[2])
+    out["f_region"] = pd.DataFrame(forest(ax, pm, REGION, "mlp", rng))
+    ax.set_xlim(-0.015, 0.05)
+    ax.set_xlabel("Δ ρ vs spot only\n(95% CI)")
+    ax.set_title("Where the gain lies", pad=3)
+    ax.tick_params(axis="y", labelsize=5.4)
+    label(ax, "f")
     save(fig, "Fig4", out)
 
 

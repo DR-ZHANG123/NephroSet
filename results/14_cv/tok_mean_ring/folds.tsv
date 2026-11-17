@@ -1,0 +1,6 @@
+model	fold	n_test	n_train	n_val
+tok_mean_ring	0	41	136	24
+tok_mean_ring	1	40	137	24
+tok_mean_ring	2	40	137	24
+tok_mean_ring	3	40	137	24
+tok_mean_ring	4	40	137	24

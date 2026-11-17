@@ -1,8 +1,8 @@
 """External cohort: regional agreement and coverage of intervals calibrated on KPMP.
 
-Regional agreement uses the same tiles as in KPMP. Conformal intervals use the quantile of
-disagreement-scaled residuals over all KPMP held-out spots (cross-validation predictions) and
-are applied unchanged to the external predictions of the model trained on all participants.
+Regional agreement uses the same tiles as in KPMP. Split-conformal intervals are calibrated on the
+KPMP validation participants of the model trained on all KPMP participants and applied unchanged
+to its external predictions.
 """
 from __future__ import annotations
 
@@ -14,7 +14,7 @@ import pandas as pd
 from scipy.stats import spearmanr
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from lib.evaluate import ext_file, PROGS, boot_ci  # noqa: E402
+from lib.evaluate import PRIMARY_SEEDS, read_ext, ext_file, PROGS, boot_ci  # noqa: E402
 from lib.repro import load_config, p, stage_dir, write_provenance  # noqa: E402
 
 cfg = load_config()
@@ -34,7 +34,7 @@ def main() -> None:
         f = ext_file(EXT, m)
         if not f.exists():
             continue
-        pr = pd.read_parquet(f).reset_index().groupby(["section", "barcode"]).mean(numeric_only=True)
+        pr = read_ext(EXT, m).reset_index().groupby(["section", "barcode"]).mean(numeric_only=True)
         mg = truth.join(pr[[f"pred_{k}" for k in PROGS]], how="inner").reset_index()
         mg["tile"] = (mg.array_row // R["tile_rows"]).astype(str) + "_" + (mg.array_col // R["tile_cols"]).astype(str)
         for s, g in mg.groupby("section"):
@@ -50,29 +50,34 @@ def main() -> None:
     for (m, k), q in reg.groupby(["model", "programme"]):
         lo, hi = boot_ci(q.rho_region.values, 2000, rng)
         summ.append(dict(model=m, programme=k, metric="rho_region", mean=q.rho_region.mean(), lo=lo, hi=hi))
-    # coverage of KPMP-calibrated intervals
+    # split-conformal intervals: the model trained on all KPMP participants is calibrated on its own
+    # KPMP validation participants (held out from fitting) and applied unchanged to the external
+    # sections. Calibration and test use the same three-seed ensemble as the primary external result.
     m = C["model"]
-    cv = pd.read_parquet(p(cfg["paths"]["cache"]) / "cv_confidence_spots.parquet")
-    # interval widths use the three seeds of cross-validation, so disagreement is on the same scale
-    ext = pd.read_parquet(ext_file(EXT, m)).reset_index()
-    ext = ext[ext.seed.isin(cfg["seeds"])]
-    cov = []
+    seeds = list(PRIMARY_SEEDS)
+    kp = p(cfg["paths"]["interim"]) / "kpmp_spots"
+    va = pd.read_parquet(EXT / "validation" / f"{m}_s10.parquet").reset_index()
+    va = va[va.seed.isin(seeds)]
+    vy = pd.concat([pd.read_parquet(kp / f"{s}.parquet").assign(section=s) for s in va.section.unique()]) \
+        .reset_index().set_index(["section", "barcode"])
+    ext = read_ext(EXT, m).reset_index()
+    cov, per = [], []
     for k in PROGS:
-        sd_cv = cv[f"sd_{k}"] + C["sd_floor"]
-        q = np.quantile(np.abs(cv[f"y_{k}"] - cv[f"pred_{k}"]) / sd_cv, 1 - C["alpha"])
-        e = ext.groupby(["section", "barcode"])[f"pred_{k}"].agg(["mean", "std"])
-        e = truth.join(e, how="inner")
+        v = vy.join(va.groupby(["section", "barcode"])[f"pred_{k}"].agg(["mean", "std"]), how="inner")
+        sc = np.abs(v[f"y_{k}"] - v["mean"]) / (v["std"] + C["sd_floor"])
+        q = np.quantile(sc, np.ceil((len(sc) + 1) * (1 - C["alpha"])) / len(sc))
+        e = truth.join(ext.groupby(["section", "barcode"])[f"pred_{k}"].agg(["mean", "std"]), how="inner")
         half = q * (e["std"] + C["sd_floor"])
-        inside = (np.abs(e[f"y_{k}"] - e["mean"]) <= half)
-        per = inside.groupby(level=0).mean()
-        lo, hi = boot_ci(per.values, 2000, rng)
-        # the same intervals re-centred on each section's own mean offset (level shift removed)
-        off = (e[f"y_{k}"] - e["mean"]).groupby(level=0).transform("mean")
-        inside_c = (np.abs(e[f"y_{k}"] - e["mean"] - off) <= half).groupby(level=0).mean()
-        cv_cov = (np.abs(cv[f"y_{k}"] - cv[f"pred_{k}"]) <= q * sd_cv).groupby(cv.participant).mean()
-        cov.append(dict(programme=k, nominal=1 - C["alpha"], q=q, kpmp_coverage=cv_cov.mean(),
-                        external_coverage=per.mean(), lo=lo, hi=hi, external_coverage_level_corrected=inside_c.mean(),
-                        median_half_width_kpmp=float(np.median(q * sd_cv)), median_half_width_external=float(half.median())))
+        inside = np.abs(e[f"y_{k}"] - e["mean"]) <= half
+        pp = inside.groupby(level=0).mean()
+        lo, hi = boot_ci(pp.values, 2000, rng)
+        cov.append(dict(programme=k, nominal=1 - C["alpha"], q=q, n_cal_spots=len(sc),
+                        n_cal_sections=int(v.index.get_level_values(0).nunique()),
+                        external_coverage_spots=inside.mean(), external_coverage=pp.mean(), lo=lo, hi=hi,
+                        donor_min=pp.min(), donor_max=pp.max(), frac_donors_ge80=(pp >= 0.8).mean(),
+                        median_half_width_external=float(half.median())))
+        per.append(pd.DataFrame(dict(programme=k, section=pp.index, coverage=pp.values)))
+    pd.concat(per).to_csv(S / "coverage_sections.tsv", sep="\t", index=False)
     pd.DataFrame(summ).to_csv(S / "region_summary.tsv", sep="\t", index=False)
     pd.DataFrame(cov).to_csv(S / "coverage.tsv", sep="\t", index=False)
     print(pd.DataFrame(summ).round(3).to_string())
