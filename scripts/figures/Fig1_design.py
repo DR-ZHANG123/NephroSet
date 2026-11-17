@@ -73,7 +73,7 @@ def main() -> None:
         "  measurements used only to evaluate",
     ], "#f3f3f3", grey)
     # question 1
-    box(ax, 0.27, 0.53, 0.33, 0.44, "1  Spatial organization (single cell)", [
+    box(ax, 0.27, 0.53, 0.33, 0.44, "1  Design rationale (single cell)", [
         f"{nums['pt_targets']:,} proximal tubule (PT) cells",
         "Target: PT injury, inflammation, transport",
         "A  composition around the cell",
@@ -93,12 +93,12 @@ def main() -> None:
             a = rng.uniform(0, 2 * np.pi)
             ax.add_patch(Ellipse((cx + 0.045 * np.cos(a), cy + 0.09 * np.sin(a)), 0.010, 0.010 * AR, fc=col, ec="none"))
     # question 2
-    box(ax, 0.27, 0.05, 0.33, 0.42, "2  Histology to molecular programmes", [
+    box(ax, 0.27, 0.05, 0.33, 0.42, "2  NephroSet", [
         "H&E crops 112 µm and 448 µm per spot",
-        "Pretrained pathology encoder (Phikon-v2)",
-        "Between spots: graph | hypergraph | set",
-        "Within spot: 8 µm tokens, attention |",
-        "  token graph | token hypergraph",
+        "Phikon-v2 pathology encoder",
+        "Fine scale: 8 µm tokens, gated attention",
+        "Context: neighbouring spots as a set",
+        "No segmentation, no anatomical prior",
         "Supervision: same-section Visium",
         "Output: 3 programmes + composition",
     ], "#fdf3ec", orange, step=0.043)
@@ -109,18 +109,19 @@ def main() -> None:
         "  within-section agreement",
         "  beyond measured composition",
         "  PT-rich spots; ~400 µm regions",
-        "  participant-level burden",
-        "  reliability ceiling of each score",
-        "Which context helps?:",
-        "  between spots vs within the spot",
-        "  anatomical vs random, compartment,",
-        "  window hyperedges",
-        "Unchanged models at a second centre:",
-        "  slide-level appearance shift",
+        "  split-half reliability reference",
+        "Design tests (same encoder):",
+        "  context between spots",
+        "  token mean, graph, hypergraph",
+        "  capture area vs crop edge",
+        "Published methods:",
+        "  iStar, BLEEP, Hist2ST",
+        "Second centre:",
+        "  model applied unchanged",
         "Confidence:",
         "  ensemble disagreement, image novelty",
-        "  conformal 90% intervals",
-    ], "#f7f2fa", "#6a3d9a", step=0.051)
+        "  calibrated 90% intervals",
+    ], "#f7f2fa", "#6a3d9a", step=0.048)
     arrow(ax, 0.23, 0.75, 0.27, 0.75)
     arrow(ax, 0.23, 0.70, 0.27, 0.30)
     arrow(ax, 0.23, 0.26, 0.27, 0.26)

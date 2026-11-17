@@ -71,7 +71,7 @@ def main() -> None:
     ax.set_xticklabels(["PT\ninjury", "Inflam-\nmation", "PT\ntransport"])
     ax.set_ylabel("Coverage per participant")
     ax.set_ylim(0.4, 1.08)
-    ax.set_title("Conformal 90% intervals", pad=3)
+    ax.set_title("Calibrated 90% intervals", pad=3)
     ax.legend(handles=[plt.Rectangle((0, 0), 1, 1, color=PAL["anatomy"], alpha=0.85, label="KPMP (held out)"),
                        plt.Rectangle((0, 0), 1, 1, color=PAL["ref"], alpha=0.85, label="Second centre")],
               loc="upper right", fontsize=5.2, borderaxespad=0.2, ncol=1)

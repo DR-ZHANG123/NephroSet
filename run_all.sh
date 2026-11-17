@@ -76,6 +76,7 @@ run 16c_scale_diagnostics results/16c_scale_diagnostics/PROVENANCE.json python s
 run 16e_composition_alt results/16e_composition_alt/PROVENANCE.json python scripts/stages/16e_composition_alt.py
 run 16f_adjustment_sensitivity results/16f_adjustment_sensitivity/PROVENANCE.json python scripts/stages/16f_adjustment_sensitivity.py
 run 16g_reliability_sensitivity results/16g_reliability_sensitivity/PROVENANCE.json python scripts/stages/16g_reliability_sensitivity.py
+run 16h_region_tissue results/16h_region_tissue/PROVENANCE.json python scripts/stages/16h_region_tissue.py
 run 17_confidence results/17_confidence/PROVENANCE.json python scripts/stages/17_confidence.py
 run 18_evaluate_external results/18_evaluate_external/PROVENANCE.json python scripts/stages/18_evaluate_external.py
 run 18b_external_reliability results/18b_external_reliability/PROVENANCE.json python scripts/stages/18b_external_reliability.py

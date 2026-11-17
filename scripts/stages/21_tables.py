@@ -57,6 +57,11 @@ def main() -> None:
         "Table S5b scale": pd.read_csv(p("results/16c_scale_diagnostics/spot_mixing.tsv"), sep="\t"),
         "Table S5c token roles": pd.read_csv(p("results/16c_scale_diagnostics/token_roles_heldout.tsv"), sep="\t")
         .groupby(["cls"]).r.agg(["mean", "std", "count"]).reset_index(),
+        "Table S5d token regions tissue": pd.read_csv(p("results/16h_region_tissue/contrasts.tsv"), sep="\t")
+        .assign(mean_tissue_tokens_inside=lambda d: pd.read_csv(p("results/16h_region_tissue/tissue_tokens.tsv"), sep="\t")
+                .mean_tissue_tokens_inside.mean(),
+                mean_tissue_tokens_outermost=lambda d: pd.read_csv(p("results/16h_region_tissue/tissue_tokens.tsv"), sep="\t")
+                .mean_tissue_tokens_outermost.mean()),
         "Table S6 external": ex,
         "Table S6b external contrasts": pd.read_csv(p("results/18_evaluate_external/contrasts.tsv"), sep="\t"),
         "Table S6c external tissue": pd.read_csv(p("results/18e_external_tissue/summary.tsv"), sep="\t")
@@ -94,6 +99,7 @@ def main() -> None:
             "KPMP cross-validation: paired model differences by participant",
             "Mixing of cell classes within Visium spots and size of spot-level anatomical units, per section",
             "Token roles: within-section correlation of spot-mean token roles with measured composition, held-out participants",
+            "Token regions: tissue tokens inside the capture spot and at the crop edge, and agreement of the region models in spots where both regions are on tissue",
             "External cohort: agreement for every model, programme and metric",
             "External cohort: paired model differences by donor",
             "External cohort: NephroSet and spot-only network after removing spots or sections with little tissue in the image, and without the donors shared with the single-cell atlas",
