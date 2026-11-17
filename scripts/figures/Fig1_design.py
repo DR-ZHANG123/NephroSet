@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 from matplotlib.patches import Ellipse, FancyArrowPatch, FancyBboxPatch, RegularPolygon
 
-from figstyle import PAL, ROOT, W2, save
+from figstyle import PAL, ROOT, W2, label, save
 
 R = ROOT / "results"
 
@@ -38,6 +38,72 @@ def hexes(ax, cx, cy, r, vals, cmap):
             k += 1
 
 
+def node(ax, x, y, w, h, text, fc, ec="0.45", ls="-", fs=5.6, bold=False):
+    ax.add_patch(FancyBboxPatch((x, y), w, h, boxstyle="round,pad=0.003,rounding_size=0.015", fc=fc, ec=ec, lw=0.7,
+                                ls=ls))
+    ax.text(x + w / 2, y + h / 2, text, ha="center", va="center", fontsize=fs, fontweight="bold" if bold else "normal",
+            linespacing=1.25)
+
+
+def link(ax, x0, y0, x1, y1, ls="-", text=None, tx=0, ty=0):
+    ax.add_patch(FancyArrowPatch((x0, y0), (x1, y1), arrowstyle="-|>", mutation_scale=7, lw=0.8, color="0.3", ls=ls,
+                                 shrinkA=0, shrinkB=0))
+    if text:
+        ax.text((x0 + x1) / 2 + tx, (y0 + y1) / 2 + ty, text, ha="center", va="center", fontsize=5.2, color="0.25")
+
+
+def architecture(ax, ar):
+    """NephroSet: pretrained encoder (grey), trained modules (orange), training-only output (dashed)."""
+    ax.set_xlim(0, 1)
+    ax.set_ylim(0, 1)
+    ax.axis("off")
+    pre, trn, io = "#e6e6e6", "#fbe3d1", "#eef4fa"
+    ax.text(0.5, 0.97, "NephroSet", ha="center", va="top", fontsize=7.2, fontweight="bold")
+    # input image: 448 um crop, 112 um crop, 55 um capture spot
+    cx, cy, s = 0.075, 0.66, 0.05
+    ax.add_patch(plt.Rectangle((cx - s, cy - s * ar), 2 * s, 2 * s * ar, fc="#f2d7e3", ec="0.5", lw=0.6))
+    ax.add_patch(plt.Rectangle((cx - s / 4, cy - s * ar / 4), s / 2, s * ar / 2, fc="#e4a9c3", ec="0.3", lw=0.6))
+    ax.add_patch(Ellipse((cx, cy), s / 4, s * ar / 4, fc="none", ec="k", lw=0.7))
+    ax.text(cx, cy - s * ar - 0.03, "H&E around spot i\n448 µm and 112 µm crops", ha="center", va="top", fontsize=5.4)
+    # neighbouring spots
+    nx, ny, r = 0.075, 0.17, 0.016
+    for k in range(7):
+        a = 2 * np.pi * (k - 1) / 6
+        px, py = (nx, ny) if k == 0 else (nx + 2.1 * r * np.cos(a), ny + 2.1 * r * ar * np.sin(a))
+        ax.add_patch(Ellipse((px, py), 2 * r, 2 * r * ar, fc="#c0602a" if k == 0 else "#9ecae1", ec="white", lw=0.4))
+    ax.text(nx, ny - 3.4 * r * ar, "Six neighbouring spots j", ha="center", va="top", fontsize=5.4)
+    node(ax, 0.17, 0.40, 0.13, 0.48, "Pathology\nencoder\n(Phikon-v2)\n\npretrained,\nnot trained", pre)
+    node(ax, 0.34, 0.66, 0.13, 0.17, "196 tokens\n14 × 14 of 8 µm", io)
+    node(ax, 0.34, 0.40, 0.13, 0.19, "Crop embeddings,\nmorphology,\nimage composition", io)
+    node(ax, 0.51, 0.66, 0.14, 0.17, "Token stem +\ngated attention → $v$", trn)
+    node(ax, 0.51, 0.42, 0.14, 0.15, "Spot stem → $h^0$", trn)
+    node(ax, 0.51, 0.08, 0.14, 0.20, "Embed $h^0_j$ with\nposition $p_j - p_i$;\nmean and max", trn)
+    node(ax, 0.69, 0.30, 0.12, 0.42, "Concatenate\n[$h^0$; $v$; mean; max]\n\ntwo-layer\nnetwork", trn)
+    node(ax, 0.85, 0.52, 0.14, 0.27, "PT injury\nInflammation\nPT transport", io, bold=True)
+    node(ax, 0.85, 0.20, 0.14, 0.22, "Composition\n(9 classes)\nauxiliary output", "white", ls=(0, (3, 2)))
+    link(ax, cx + s, cy, 0.17, cy)
+    link(ax, 0.30, 0.745, 0.34, 0.745)
+    link(ax, 0.30, 0.495, 0.34, 0.495)
+    link(ax, 0.47, 0.745, 0.51, 0.745)
+    link(ax, 0.47, 0.495, 0.51, 0.495)
+    link(ax, nx + 3.2 * r, ny, 0.51, ny)
+    link(ax, 0.58, 0.42, 0.58, 0.28, text="shared stem", tx=0.045)
+    link(ax, 0.65, 0.745, 0.69, 0.62)
+    link(ax, 0.65, 0.495, 0.69, 0.51)
+    link(ax, 0.65, 0.18, 0.69, 0.38)
+    link(ax, 0.81, 0.62, 0.85, 0.655)
+    link(ax, 0.81, 0.40, 0.85, 0.31, ls=(0, (3, 2)))
+    # key
+    ky = 0.015
+    for i, (fc, ls, t) in enumerate([(pre, "-", "pretrained, not trained"), (trn, "-", "trained"),
+                                      ("white", (0, (3, 2)), "training only (supervised by\nVisium composition)")]):
+        x = 0.17 + i * 0.2
+        ax.add_patch(FancyBboxPatch((x, ky), 0.025, 0.045, boxstyle="round,pad=0.002", fc=fc, ec="0.45", lw=0.6, ls=ls))
+        ax.text(x + 0.032, ky + 0.0225, t, ha="left", va="center", fontsize=5.2)
+    ax.text(0.92, 0.88, "Supervision: same-section\nVisium programme scores", ha="center", va="center", fontsize=5.2,
+            color="0.25")
+
+
 def main() -> None:
     atlas = pd.read_csv(R / "01_atlas_extract" / "atlas_samples.tsv", sep="\t")
     tg = pd.read_csv(R / "02_atlas_features" / "targets_per_section.tsv", sep="\t")
@@ -48,10 +114,15 @@ def main() -> None:
                 pt_targets=int(tg.n_targets.sum()), kpmp_participants=len(kp), kpmp_spots=int(kp.n_spots.sum()),
                 ext_donors=len(ex), ext_spots=int(ex.n_spots.sum()))
 
-    fig = plt.figure(figsize=(W2, 3.3))
+    H = 6.3
+    fig = plt.figure(figsize=(W2, H))
     global AR
     AR = W2 / 3.3
-    ax = fig.add_axes([0, 0, 1, 1])
+    arch = fig.add_axes([0, 3.62 / H, 1, 2.55 / H])
+    architecture(arch, W2 / 2.55)
+    label(arch, "a")
+    ax = fig.add_axes([0, 0, 1, 3.3 / H])
+    label(ax, "b")
     ax.set_xlim(0, 1)
     ax.set_ylim(0, 1)
     ax.axis("off")
