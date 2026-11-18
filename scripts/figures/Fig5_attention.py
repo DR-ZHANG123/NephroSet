@@ -36,6 +36,10 @@ def forest(ax, rows, ylab, xcol="log2_ratio", col="0.2", dy=0.0, ms=2.8, marker=
     return y
 
 
+def ordinal(n: int) -> str:
+    return f"{n}{'th' if 10 <= n % 100 <= 20 else {1: 'st', 2: 'nd', 3: 'rd'}.get(n % 10, 'th')}"
+
+
 def main() -> None:
     enr = pd.read_csv(SRC / "Fig5_attention_a_enrichment.tsv", sep="\t")
     mor = pd.read_csv(SRC / "Fig5_attention_b_morphology.tsv", sep="\t")
@@ -127,7 +131,7 @@ def main() -> None:
         cls = np.where(tis, z["cls"][i], np.nan).astype(float)
         a0 = fig.add_subplot(eg[0, i])
         a0.imshow(img)
-        a0.set_title(f"P{i // 2 + 1}, {r.injury_group} injury\n({r.y_pt_injury_pct:.0f}th pct)", pad=2,
+        a0.set_title(f"P{i // 2 + 1}, {r.injury_group} injury\n({ordinal(round(r.y_pt_injury_pct))} pct)", pad=2,
                      fontsize=5.6)
         a1 = fig.add_subplot(eg[1, i])
         a1.imshow(img)

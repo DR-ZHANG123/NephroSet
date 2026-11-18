@@ -78,9 +78,9 @@ N_RAND = 5
 MIN_TIS = 20            # tissue tokens per spot for per-spot statistics
 PT_RICH = E["pt_rich_min"]
 COMPS = list(COMPARTMENTS)
-EXAMPLE_RULE = ("Participants: the three held-out participants with the most PT-rich spots (measured PT "
-                "fraction >= 0.5), at most one per outer fold. Candidate spots: PT-rich spots with >= 70% "
-                "tissue tokens. High injury: top decile of measured PT injury among the participant's "
+EXAMPLE_RULE = ("Participants: the three held-out participants with the most candidate spots, at most one per "
+                "outer fold. Candidate spots (representative tubular tissue): measured PT fraction >= 0.7, "
+                ">= 95% tissue tokens, >= 50% of tissue tokens assigned to PT and <= 15% pale tokens. High injury: top decile of measured PT injury among the participant's "
                 "candidate spots, choosing the spot with the highest predicted injury; low injury: bottom "
                 "decile, choosing the spot with the lowest predicted injury.")
 
@@ -357,7 +357,8 @@ def analyse(cache, tok, sections, ex_rng):
 # 4  examples
 # ------------------------------------------------------------------------------------------------
 def choose_examples(spots):
-    q = spots[(spots.comp_PT >= PT_RICH) & (spots.n_tissue >= 0.7 * TK.NT)]
+    q = spots[(spots.comp_PT >= 0.7) & (spots.n_tissue >= 0.95 * TK.NT) & (spots.share_PT >= 0.5)
+              & (spots.share_pale <= 0.15)]
     cnt = q.groupby(["participant", "fold"]).size().reset_index(name="n").sort_values("n", ascending=False)
     chosen, folds = [], set()
     for _, r in cnt.iterrows():
@@ -438,6 +439,8 @@ def main() -> None:
     pd.DataFrame(infos).to_csv(S / "folds.tsv", sep="\t", index=False)
     print(ss.to_string(), flush=True)
 
+    if not need:  # resumed from the cache: token colour features do not depend on the fold projection
+        tok = m14b.load_tokens(sections.section, fold=0)
     spots, enr, mor, secr, inj, dpart, dsum = analyse(cache, tok, sections, None)
     enr.to_csv(S / "enrichment.tsv", sep="\t", index=False)
     mor.to_csv(S / "morphology_correlation.tsv", sep="\t", index=False)
