@@ -15,14 +15,26 @@ DX_ORDER = ["Diabetic kidney disease", "Hypertensive kidney disease", "Acute tub
 SRC_ORDER = ["Needle biopsy", "Donor kidney biopsy", "Nephrectomy or intra-operative"]
 
 
-def hforest(ax, d, order, col):
+def hbars(ax, d, order, cmap, overall=None):
+    """Horizontal bars coloured by value, 95% interval whiskers, participants per group inside the bar."""
     rows = []
+    vals = [d[d.group == g].rho.iloc[0] for g in order]
+    lo_v, hi_v = min(vals), max(vals)
     for i, g in enumerate(order):
         q = d[d.group == g].iloc[0]
-        ax.errorbar(q.rho, -i, xerr=[[q.rho - q.lo], [q.hi - q.rho]], fmt="o", ms=3, color=col, lw=0.8)
+        c = cmap(0.35 + 0.6 * (q.rho - lo_v) / max(hi_v - lo_v, 1e-9))
+        ax.barh(-i, q.rho, 0.72, color=c, ec="none")
+        ax.plot([q.lo, q.hi], [-i, -i], color="0.15", lw=0.7)
+        ax.text(q.hi + 0.008, -i, f"n = {int(q.n)}", fontsize=4.9, va="center", ha="left", color="0.3",
+                bbox=dict(fc="white", ec="none", pad=0.4), zorder=6)
         rows.append(q.to_dict())
+    if overall is not None:
+        ln = ax.axvline(overall, color="0.3", lw=0.6, ls=(0, (2, 1.5)))
+        ln._is_reference = True
+        ax.text(overall + 0.006, 0.62, "all participants", fontsize=4.9, ha="left", va="bottom", color="0.3")
     ax.set_yticks(-np.arange(len(order)))
-    ax.set_yticklabels([f"{g} ({int(d[d.group == g].n.iloc[0])})" for g in order])
+    ax.set_yticklabels(order)
+    ax.set_ylim(-len(order) + 0.4, 1.1 if overall is not None else 0.6)
     return rows
 
 
@@ -37,17 +49,17 @@ def main() -> None:
                           left=0.24, right=0.985, top=0.92, bottom=0.12)
     d = sg[(sg.grouping == "diagnosis") & (sg.programme == "pt_injury")]
     ax = fig.add_subplot(gs[0, 0])
-    r1 = hforest(ax, d, DX_ORDER, PAL["anatomy"])
+    r1 = hbars(ax, d, DX_ORDER, plt.cm.Oranges, overall=0.261)
     ax.set_xlabel("Within-section ρ, PT injury")
     ax.set_title("By diagnosis (KPMP, held out)", pad=3)
-    ax.set_xlim(0, 0.4)
+    ax.set_xlim(0, 0.46)
     label(ax, "a")
     d = sg[(sg.grouping == "source") & (sg.programme == "pt_injury")]
     ax = fig.add_subplot(gs[1, 0])
-    r2 = hforest(ax, d, SRC_ORDER, PAL["ref"])
+    r2 = hbars(ax, d, SRC_ORDER, plt.cm.Blues)
     ax.set_xlabel("Within-section ρ, PT injury")
     ax.set_title("By tissue source", pad=3)
-    ax.set_xlim(0, 0.4)
+    ax.set_xlim(0, 0.46)
     label(ax, "b")
 
     ax = fig.add_subplot(gs[:, 1])

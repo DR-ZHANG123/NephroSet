@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from matplotlib.lines import Line2D
+from matplotlib.patches import Patch
 
 from figstyle import MODEL_LABEL, PAL, ROOT, W2, label, save
 
@@ -63,8 +64,9 @@ def main() -> None:
         for j, m in enumerate(SHOW):
             q = sm[(sm.model == m) & (sm.programme == k)]
             x = i + (j - (len(SHOW) - 1) / 2) * (0.86 / len(SHOW))
-            ax.scatter(x + rng.uniform(-0.02, 0.02, len(q)), q.rho, s=3, color=COL[m], alpha=0.45, lw=0)
-            ax.plot([x - 0.042, x + 0.042], [q.rho.mean()] * 2, color=COL[m], lw=1.6)
+            ax.bar(x, q.rho.mean(), 0.86 / len(SHOW) * 0.9, color=COL[m], alpha=0.85 if m == "tok_abmil_ctx" else 0.6,
+                   ec="k" if m == "tok_abmil_ctx" else "none", lw=0.5)
+            ax.scatter(x + rng.uniform(-0.018, 0.018, len(q)), q.rho, s=2.2, color="0.15", alpha=0.55, lw=0, zorder=3)
             rows += [dict(programme=k, model=m, section=s, rho=r) for s, r in zip(q.section, q.rho)]
         c = ceil[ceil.programme == k].rel_spot.iloc[0]
         ln = ax.hlines(c, i - 0.45, i + 0.45, colors="0.3", linestyles=(0, (2, 1.5)), lw=0.8)
@@ -78,7 +80,7 @@ def main() -> None:
     ax.set_title("Spot level, second centre", pad=3)
     ax.set_ylim(-0.25, 1.0)
     ax.set_yticks([-0.2, 0, 0.2, 0.4, 0.6, 0.8, 1.0])
-    hl = [Line2D([], [], color=COL[m], lw=1.6, label=MODEL_LABEL[m]) for m in SHOW]
+    hl = [Patch(fc=COL[m], alpha=0.7, label=MODEL_LABEL[m]) for m in SHOW]
     hl.append(Line2D([], [], ls=(0, (2, 1.5)), color="0.3", lw=0.8, label="Reliability reference"))
     fig.legend(handles=hl, loc="lower center", bbox_to_anchor=(0.5, 0.0), fontsize=5.2, ncol=4, handlelength=1.2,
                columnspacing=0.9, frameon=False)

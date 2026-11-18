@@ -17,7 +17,7 @@ MODELS = [("gbm_measured_comp", r"Measured composition\textsuperscript{a}"), ("g
           ("knn_encoder", r"Retrieval, same encoder\textsuperscript{b}"),
           ("tok_pred_mean", r"Token-level prediction, same encoder\textsuperscript{c}"),
           ("ridge_image", "Linear probe"), ("mlp", "Spot only"), ("gcn", "Lattice graph (GCN)"),
-          ("set_anat", "Anatomical spot hypergraph"), ("deepsets", "Neighbourhood set"),
+          ("set_anat", "Anatomical set hypergraph"), ("deepsets", "Neighbourhood set"),
           ("tok_abmil", "Token attention"), ("tok_hyper_anat", "Anatomical token hypergraph"),
           ("tok_abmil_ctx", r"\method{}")]
 

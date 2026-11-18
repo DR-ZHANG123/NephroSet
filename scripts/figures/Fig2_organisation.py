@@ -4,6 +4,7 @@ from __future__ import annotations
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from matplotlib.patches import Patch
 from matplotlib.lines import Line2D
 
 from figstyle import PAL, ROOT, W2, label, save
@@ -90,9 +91,10 @@ def main() -> None:
         for j, tg in enumerate(tg_show):
             for null in (False, True):
                 q = inc[(inc.contrast == cn) & (inc.programme == tg) & (inc.null == null)].iloc[0]
-                yy = i * 4 + j + (0.35 if null else 0)
-                ax.errorbar(q["mean"], -yy, xerr=[[q["mean"] - q.lo], [q.hi - q["mean"]]], fmt="o" if not null else "s",
-                            ms=2.6, color=cols[j], mfc=cols[j] if not null else "white", lw=0.8, capsize=0)
+                yy = i * 4 + j + (0.38 if null else 0)
+                ax.barh(-yy, q["mean"], 0.36, color="white" if null else cols[j], ec=cols[j], lw=0.6,
+                        hatch="//////" if null else None)
+                ax.plot([q.lo, q.hi], [-yy, -yy], color="0.15", lw=0.6)
                 yrows.append(dict(contrast=cn, target=tg, permuted=null, mean=q["mean"], lo=q.lo, hi=q.hi,
                                   frac_donors_positive=q.frac_donors_positive))
     ax.axvline(0, c="0.6", lw=0.5)
@@ -101,9 +103,9 @@ def main() -> None:
     ax.set_yticklabels([c[1] for c in con])
     ax.set_xlabel("Increment (95% CI over donors)")
     ax.set_title("Where the spatial information lies", pad=3)
-    hl = [Line2D([], [], marker="o", ls="", ms=3, color=c, label=TARGETS[t]) for c, t in zip(cols, tg_show)]
-    hl += [Line2D([], [], marker="o", ls="", ms=3, color="0.3", label="Observed labels"),
-           Line2D([], [], marker="s", ls="", ms=3, mfc="white", color="0.3", label="Permuted within 100 µm")]
+    hl = [Patch(fc=c, label=TARGETS[t]) for c, t in zip(cols, tg_show)]
+    hl += [Patch(fc="0.45", label="Observed labels"), Patch(fc="white", ec="0.45", hatch="//////",
+                                                           label="Permuted within 100 µm")]
     ax.legend(handles=hl, loc="lower right", fontsize=5.3, handletextpad=0.2, borderaxespad=0.2)
     ax.set_xlim(-0.006, 0.05)
     label(ax, "c")
