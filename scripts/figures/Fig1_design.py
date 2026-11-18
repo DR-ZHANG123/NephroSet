@@ -154,8 +154,7 @@ def panel_a(ax, nums):
     # pretrained encoder
     frame(ax, 39, 72, 61, 124, GREY, ec="#9E9E9E")
     icon(ax, "encoder", 41.5, 93, 17, 22)
-    text(ax, 50, 88.5, "Pathology\nencoder", weight="bold")
-    text(ax, 50, 79.5, "pretrained,\nnot trained", size=5.6, color=SOFT)
+    text(ax, 50, 84.0, "Pathology\nencoder\n(pretrained)", weight="bold")
     arrow(ax, 31.5, 89.5, 39, 89.5)
     # branch 1: tokens + gated attention
     frame(ax, 67, 106, 121, 141, ORANGE, ec="#D9A47F")
@@ -209,8 +208,6 @@ def panel_a(ax, nums):
     # supervision and inference
     icon(ax, "rna", 129, 54.5, 11, 9)
     text(ax, 141.5, 59.0, "Training: same-section\nVisium programme scores", size=5.6, ha="left", color=SOFT)
-    frame(ax, 4, 54, 35, 67, BLUE, ec="#9DB9D3")
-    text(ax, 19.5, 60.5, "At inference: H&E image\nand spot coordinates only", size=5.6)
     # legend
     for i, (fc, ec, lab) in enumerate([(GREY, "#9E9E9E", "pretrained"), (ORANGE, "#D9A47F", "trained")]):
         lx = 4 + i * 20
