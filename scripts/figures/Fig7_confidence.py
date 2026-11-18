@@ -90,10 +90,10 @@ def main() -> None:
     ax.set_xlabel("Spots retained (%)")
     ax.set_ylabel("Change in mean absolute error,\nPT injury (%)")
     ax.set_title("Selective prediction", pad=3)
-    ax.set_ylim(-3, 1)
+    ax.set_ylim(-2.0, 0.3)
     ax.legend(loc="lower left", fontsize=5.2, borderaxespad=0.2)
     label(ax, "d")
-    save(fig, "Fig6", {"a_diagnosis": pd.DataFrame(r1), "b_source": pd.DataFrame(r2), "c_coverage": pd.DataFrame(rows),
+    save(fig, "Fig7", {"a_diagnosis": pd.DataFrame(r1), "b_source": pd.DataFrame(r2), "c_coverage": pd.DataFrame(rows),
                        "d_retained": q})
 
 

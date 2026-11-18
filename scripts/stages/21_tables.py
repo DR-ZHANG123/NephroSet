@@ -30,20 +30,28 @@ def f(x, lo=None, hi=None):
 def main() -> None:
     cv = pd.read_csv(p("results/16_evaluate_cv/summary.tsv"), sep="\t")
     ex = pd.read_csv(p("results/18_evaluate_external/summary.tsv"), sep="\t")
-    rows, tex = [], []
+    rows = []
     for m, lab in MODELS:
-        r = {"model": m}
-        cells = [lab]
+        r = {"model": m, "label": lab}
         for k in ["pt_injury", "pt_transport"]:
             for tab, coh in [(cv, "KPMP"), (ex, "External")]:
                 for met in ["rho", "rho_beyond_comp"]:
                     q = tab[(tab.model == m) & (tab.programme == k) & (tab.metric == met)].iloc[0]
                     r[f"{k}_{coh}_{met}"] = q["mean"]
                     r[f"{k}_{coh}_{met}_lo"], r[f"{k}_{coh}_{met}_hi"] = q.lo, q.hi
-                    cells.append(f(q["mean"]))
         rows.append(r)
+    t2 = pd.DataFrame(rows)
+    cols = [f"{k}_{c}_{m}" for k in ["pt_injury", "pt_transport"] for c in ["KPMP", "External"]
+            for m in ["rho", "rho_beyond_comp"]]
+    image = t2.model != "gbm_measured_comp"  # the reference model is not an image model
+    best = {c: t2.loc[image, c].round(2).max() for c in cols}
+    tex = []
+    for _, r in t2.iterrows():
+        bold = lambda v, on: rf"\textbf{{{v}}}" if on else v  # noqa: E731
+        cells = [bold(r.label, r.model == "tok_abmil_ctx")]
+        cells += [bold(f(r[c]), r.model != "gbm_measured_comp" and round(r[c], 2) == best[c]) for c in cols]
         tex.append(" & ".join(cells) + r" \\")
-    pd.DataFrame(rows).to_csv(S / "table2.tsv", sep="\t", index=False)
+    t2.drop(columns="label").to_csv(S / "table2.tsv", sep="\t", index=False)
     (S / "table2_rows.tex").write_text("\n".join(tex) + "\n")
     # Additional file 2 workbook
     sheets = {

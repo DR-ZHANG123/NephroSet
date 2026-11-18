@@ -105,7 +105,7 @@ def fig_s3():
                             Line2D([], [], marker="o", ls="", ms=3, color=PAL["ref"], label="Standardized within section")],
                    loc="upper right", fontsize=5.2, borderaxespad=0.2)
     fig.subplots_adjust(wspace=0.35, bottom=0.25, left=0.1, right=0.98, top=0.88)
-    save(fig, "FigS4", {"section_standardized": pd.DataFrame(rows)})
+    save(fig, "FigS3", {"section_standardized": pd.DataFrame(rows)})
 
 
 def table_s1():

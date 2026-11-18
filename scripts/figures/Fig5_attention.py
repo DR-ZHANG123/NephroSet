@@ -1,6 +1,6 @@
-"""Figure S4: what NephroSet attends to inside the spot (token attention, held-out participants).
+"""Figure 5: what NephroSet attends to inside the spot (token attention, held-out participants).
 
-Reads only figures/source_data/FigS3_* written by scripts/stages/16d_token_attention.py.
+Reads only figures/source_data/Fig5_attention_* written by scripts/stages/16d_token_attention.py.
 """
 from __future__ import annotations
 
@@ -37,12 +37,12 @@ def forest(ax, rows, ylab, xcol="log2_ratio", col="0.2", dy=0.0, ms=2.8, marker=
 
 
 def main() -> None:
-    enr = pd.read_csv(SRC / "FigS3_a_enrichment.tsv", sep="\t")
-    mor = pd.read_csv(SRC / "FigS3_b_morphology.tsv", sep="\t")
-    inj = pd.read_csv(SRC / "FigS3_c_injury.tsv", sep="\t")
-    dsum = pd.read_csv(SRC / "FigS3_d_deletion.tsv", sep="\t")
-    ex = pd.read_csv(SRC / "FigS3_e_examples.tsv", sep="\t")
-    z = np.load(SRC / "FigS3_e_examples.npz", allow_pickle=True)
+    enr = pd.read_csv(SRC / "Fig5_attention_a_enrichment.tsv", sep="\t")
+    mor = pd.read_csv(SRC / "Fig5_attention_b_morphology.tsv", sep="\t")
+    inj = pd.read_csv(SRC / "Fig5_attention_c_injury.tsv", sep="\t")
+    dsum = pd.read_csv(SRC / "Fig5_attention_d_deletion.tsv", sep="\t")
+    ex = pd.read_csv(SRC / "Fig5_attention_e_examples.tsv", sep="\t")
+    z = np.load(SRC / "Fig5_attention_e_examples.npz", allow_pickle=True)
     classes = list(z["classes"])
 
     fig = plt.figure(figsize=(W2, 6.9))
@@ -161,7 +161,7 @@ def main() -> None:
     first.text(1.0, -0.02, "50 µm", transform=first.transAxes, ha="right", va="top", fontsize=5)
     label(first, "e")
     _ = Line2D
-    save(fig, "FigS3")
+    save(fig, "Fig5")
 
 
 if __name__ == "__main__":

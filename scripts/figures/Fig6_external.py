@@ -126,7 +126,7 @@ def main() -> None:
     ax.set_ylim(-0.25, 0.85)
     ax.legend(loc="upper left", fontsize=5.2, borderaxespad=0.2)
     label(ax, "d")
-    save(fig, "Fig5", {"a_example_spots": ex[["barcode", "tx", "ty", "y_pt_injury", "pred_pt_injury", "rank_y_pt_injury", "rank_pred_pt_injury"]],
+    save(fig, "Fig6", {"a_example_spots": ex[["barcode", "tx", "ty", "y_pt_injury", "pred_pt_injury", "rank_y_pt_injury", "rank_pred_pt_injury"]],
                        "b_donors": pd.DataFrame(rows), "b_ceiling": ceil, "c_paired": pd.DataFrame(pr),
                        "d_spread": q})
 

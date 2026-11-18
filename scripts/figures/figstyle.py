@@ -19,7 +19,7 @@ SRC = FIG / "source_data"
 SRC.mkdir(parents=True, exist_ok=True)
 
 MM = 1 / 25.4
-W1, W2 = 85 * MM, 170 * MM          # single and double column widths
+W1, W2 = 85 * MM, 170 * MM          # BMC single and double column widths
 
 mpl.rcParams.update({
     "font.family": "sans-serif", "font.sans-serif": ["Arial", "Liberation Sans", "DejaVu Sans"],
@@ -103,6 +103,11 @@ def align_panel_labels(fig, pad_mm: float = 1.5) -> None:
             cols.append([a])
     ypos = {a: max(boxes[b][1, 1] for b in row) + pad for row in rows for a in row}
     xpos = {a: min(boxes[b][0, 0] for b in col) for col in cols for a in col}
+    first = [min(row, key=lambda a: boxes[a][0, 0]) for row in rows]
+    if len(first) > 1:  # the first letter of every row sits on the same left edge
+        x0 = min(xpos[a] for a in first)
+        for a in first:
+            xpos[a] = x0
     for a in axes:
         for t in list(fig.texts):
             if getattr(t, "_panel_of", None) is a:

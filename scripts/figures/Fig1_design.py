@@ -22,7 +22,7 @@ from figstyle import ROOT, save
 
 R = ROOT / "results"
 ICONS = ROOT / "figures" / "fig1_icons"
-W, H, Y0 = 180.0, 150.0, 12.0
+W, H, Y0 = 180.0, 152.5, 12.0
 INK, SOFT = "#222222", "#555555"
 GREY, ORANGE, BLUE, LINE = "#E6E6E6", "#F6D9C4", "#E3EEF8", "#6E6E6E"
 TEXTS, BOXES = [], []
@@ -286,7 +286,7 @@ def main() -> None:
     ax.axis("off")
     panel_a(ax, nums)
     panel_b(ax, nums)
-    for letter, y in (("a", H - 1.0), ("b", 47.0)):
+    for letter, y in (("a", H - 0.2), ("b", 46.6)):
         ax.text(0.0, y, letter, fontsize=9, fontweight="bold", ha="left", va="top" if letter == "a" else "bottom")
     bad = overlaps(fig, ax)
     for b in bad:

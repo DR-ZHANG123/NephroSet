@@ -136,11 +136,67 @@ def crop_schematic(ax):
     return pd.DataFrame(dict(token=np.arange(196), row=r, col=c, dist_um=d, inside=d <= 27.5, outermost32=outer))
 
 
+COST = [("mlp", "Spot only"), ("deepsets", "Neighbourhood set"), ("tok_mean", "Token mean"),
+        ("tok_abmil", "Token attention"), ("tok_gat", "Token graph"), ("tok_hyper_anat", "Anatomical token\nhypergraph"),
+        ("tok_hyper_anat_ctx", "Anatomical token\nhypergraph + set"), ("tok_abmil_ctx", "NephroSet")]
+OFFS = {"mlp": (6, 0, "left"), "deepsets": (6, 0, "left"), "tok_mean": (-6, 0, "right"),
+        "tok_abmil": (5, -8, "left"), "tok_gat": (6, 0, "left"), "tok_hyper_anat": (4, -18, "left"),
+        "tok_hyper_anat_ctx": (0, 11, "center"), "tok_abmil_ctx": (-6, 6, "right")}
+
+
+def cost_rows(cost, summ):
+    rows = []
+    for m, lab in COST:
+        r = summ.loc[(m, "pt_injury", "rho")]
+        rows.append(dict(model=m, label=lab.replace("\n", " "), short=lab, train_min=cost.loc[m, "train_min_per_model"],
+                         inference_ms=cost.loc[m, "inference_s_per_section"] * 1000, rho=r["mean"], lo=r["lo"],
+                         hi=r["hi"]))
+    return pd.DataFrame(rows)
+
+
+def colour(m):
+    return PAL["anatomy"] if m == "tok_abmil_ctx" else ("0.25" if m.startswith("tok") else "0.6")
+
+
+def cost_panel(ax, d):
+    """Injury agreement against estimated downstream training compute; NephroSet highlighted."""
+    for r in d.itertuples():
+        nep = r.model == "tok_abmil_ctx"
+        ax.scatter(r.train_min, r.rho, s=34 if nep else 18, color=colour(r.model), ec="k" if nep else "none", lw=0.5,
+                   zorder=4)
+        dx, dy, ha = OFFS[r.model]
+        ax.annotate(r.short, (r.train_min, r.rho), xytext=(dx, dy), textcoords="offset points", fontsize=5.2, ha=ha,
+                    va="center", color=colour(r.model) if nep else "0.2", fontweight="bold" if nep else "normal")
+    ax.axhline(d.set_index("model").loc["tok_abmil_ctx", "rho"], color=PAL["anatomy"], lw=0.6, ls=(0, (3, 2)),
+               zorder=1)
+    ax.set_xscale("log")
+    ax.set_xlim(0.04, 25)
+    ax.set_ylim(0.212, 0.278)
+    ax.set_xlabel("Estimated downstream training compute (min per model)")
+    ax.set_ylabel("PT injury ρ (KPMP, held out)")
+    ax.set_title("Accuracy and training cost", pad=3)
+
+
+def inference_panel(ax, d):
+    d = d.iloc[::-1]
+    y = np.arange(len(d))
+    ax.barh(y, d.inference_ms, color=[colour(m) for m in d.model], height=0.62)
+    ax.set_yticks(y)
+    ax.set_yticklabels([s.replace("\n", " ") for s in d.short], fontsize=5.4)
+    ax.set_xscale("log")
+    ax.set_xlim(0.1, 100)
+    for yy, v in zip(y, d.inference_ms):
+        ax.text(v * 1.15, yy, f"{v:.1f}" if v >= 1 else f"{v:.2f}", fontsize=5.0, va="center", ha="left")
+    ax.set_xlabel("Downstream inference per section (ms)")
+    ax.set_title("Inference time", pad=3)
+
+
 def main() -> None:
     pm = pd.read_csv(R / "16_evaluate_cv" / "participant_metrics.tsv", sep="\t")
     rng = np.random.default_rng(2026)
-    fig = plt.figure(figsize=(W2, 5.6))
-    outer = fig.add_gridspec(2, 1, height_ratios=[1, 0.85], hspace=0.62, left=0.14, right=0.96, top=0.91, bottom=0.1)
+    fig = plt.figure(figsize=(W2, 7.9))
+    outer = fig.add_gridspec(3, 1, height_ratios=[1, 0.85, 0.75], hspace=0.62, left=0.14, right=0.96, top=0.935,
+                             bottom=0.07)
     gs = outer[0].subgridspec(1, 3, wspace=1.25)
     out = {}
     for j, (items, ref, xlab, title, xl, key) in enumerate([
@@ -173,6 +229,17 @@ def main() -> None:
     ax.set_title("Where the gain lies", pad=3)
     ax.tick_params(axis="y", labelsize=5.4)
     label(ax, "f")
+    cost = pd.read_csv(R / "21b_model_cost" / "model_cost.tsv", sep="\t").set_index("model")
+    summ = pd.read_csv(R / "16_evaluate_cv" / "summary.tsv", sep="\t").set_index(["model", "programme", "metric"])
+    d = cost_rows(cost, summ)
+    out["gh_cost"] = d.drop(columns="short")
+    row3 = outer[2].subgridspec(1, 2, width_ratios=[1.25, 1], wspace=0.75)
+    ax = fig.add_subplot(row3[0])
+    cost_panel(ax, d)
+    label(ax, "g")
+    ax = fig.add_subplot(row3[1])
+    inference_panel(ax, d)
+    label(ax, "h")
     save(fig, "Fig4", out)
 
 

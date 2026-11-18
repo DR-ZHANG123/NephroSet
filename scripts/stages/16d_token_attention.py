@@ -450,13 +450,13 @@ def main() -> None:
     (S / "example_rule.txt").write_text(EXAMPLE_RULE + "\n")
     img, att, cls = example_arrays(ex, cache)
     # figure source data
-    enr.to_csv(SRC / "FigS3_a_enrichment.tsv", sep="\t", index=False)
-    mor.to_csv(SRC / "FigS3_b_morphology.tsv", sep="\t", index=False)
-    inj.to_csv(SRC / "FigS3_c_injury.tsv", sep="\t", index=False)
-    dpart.to_csv(SRC / "FigS3_d_deletion_participants.tsv", sep="\t", index=False)
-    dsum.to_csv(SRC / "FigS3_d_deletion.tsv", sep="\t", index=False)
-    ex.to_csv(SRC / "FigS3_e_examples.tsv", sep="\t", index=False)
-    np.savez_compressed(SRC / "FigS3_e_examples.npz", img=img, att=att, cls=cls,
+    enr.to_csv(SRC / "Fig5_attention_a_enrichment.tsv", sep="\t", index=False)
+    mor.to_csv(SRC / "Fig5_attention_b_morphology.tsv", sep="\t", index=False)
+    inj.to_csv(SRC / "Fig5_attention_c_injury.tsv", sep="\t", index=False)
+    dpart.to_csv(SRC / "Fig5_attention_d_deletion_participants.tsv", sep="\t", index=False)
+    dsum.to_csv(SRC / "Fig5_attention_d_deletion.tsv", sep="\t", index=False)
+    ex.to_csv(SRC / "Fig5_attention_e_examples.tsv", sep="\t", index=False)
+    np.savez_compressed(SRC / "Fig5_attention_e_examples.npz", img=img, att=att, cls=cls,
                         classes=np.array(CLASSES), tissue_min=TK.TISSUE_MIN,
                         tissue=np.stack([tok[s][1][list(tok[s][2]).index(b), :, 0].float().numpy().reshape(TK.G, TK.G)
                                          for s, b in zip(ex.section, ex.barcode)]))
