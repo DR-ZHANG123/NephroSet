@@ -1,107 +1,274 @@
-"""Figure 1: study design, drawn in code. Cohort numbers are read from result tables."""
+"""Figure 1: the NephroSet framework (a) and the study workflow (b), drawn as vector graphics.
+
+Pictograms are the traced icons in figures/fig1_icons/ (scripts/figures/fig1_icons.py); every label, arrow,
+the token grid, the attention map and the neighbour lattice are drawn here. Cohort numbers are read from
+result tables. Coordinates are millimetres.
+"""
 from __future__ import annotations
+
+import colorsys
+import re
+import sys
+import xml.etree.ElementTree as ET
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from matplotlib.patches import Ellipse, FancyArrowPatch, FancyBboxPatch, RegularPolygon
+from matplotlib.patches import Circle, FancyArrowPatch, FancyBboxPatch, PathPatch, Rectangle, Wedge
+from matplotlib.path import Path as MPath
+from svgpath2mpl import parse_path
 
-from figstyle import PAL, ROOT, W2, label, save
+from figstyle import ROOT, save
 
 R = ROOT / "results"
+ICONS = ROOT / "figures" / "fig1_icons"
+W, H, Y0 = 180.0, 150.0, 12.0
+INK, SOFT = "#222222", "#555555"
+GREY, ORANGE, BLUE, LINE = "#E6E6E6", "#F6D9C4", "#E3EEF8", "#6E6E6E"
+TEXTS, BOXES = [], []
+_cache: dict[str, tuple] = {}
 
 
-def box(ax, x, y, w, h, title, lines, fc, title_fc, step=0.052):
-    ax.add_patch(FancyBboxPatch((x, y), w, h, boxstyle="round,pad=0.004,rounding_size=0.012", fc=fc, ec="0.55", lw=0.6))
-    ax.add_patch(FancyBboxPatch((x, y + h - 0.075), w, 0.075, boxstyle="round,pad=0.004,rounding_size=0.012",
-                                fc=title_fc, ec="none"))
-    ax.text(x + w / 2, y + h - 0.0375, title, ha="center", va="center", fontsize=6.8, fontweight="bold", color="white")
-    for i, ln in enumerate(lines):
-        bold = ln.endswith(":")
-        ax.text(x + 0.012, y + h - 0.105 - i * step, ln.rstrip(":") if bold else ln, ha="left", va="top",
-                fontsize=5.8, fontweight="bold" if bold else "normal")
-
-
-def arrow(ax, x0, y0, x1, y1):
-    ax.add_patch(FancyArrowPatch((x0, y0), (x1, y1), arrowstyle="-|>", mutation_scale=7, lw=0.8, color="0.35"))
-
-
-def hexes(ax, cx, cy, r, vals, cmap):
-    k = 0
-    for i in range(-1, 2):
-        for j in range(-1, 2):
-            if abs(i + j) > 1 and i * j > 0:
+# ------------------------------------------------------------------ icons
+def _load(name: str):
+    if name not in _cache:
+        root = ET.parse(ICONS / f"{name}.svg").getroot()
+        cw, ch = float(root.get("width")), float(root.get("height"))
+        items = []
+        for el in root.iter("{http://www.w3.org/2000/svg}path"):
+            try:
+                p = parse_path(el.get("d"))
+            except ValueError:
                 continue
-            x = cx + r * 1.75 * (j + 0.5 * i)
-            y = cy + r * 1.52 * i
-            ax.add_patch(RegularPolygon((x, y), 6, radius=r, fc=cmap(vals[k % len(vals)]), ec="white", lw=0.4))
-            k += 1
+            if len(p.vertices) < 3:
+                continue
+            m = re.search(r"translate\(([-\d.]+)[ ,]+([-\d.]+)\)", el.get("transform", ""))
+            v = p.vertices + (np.array([float(m.group(1)), float(m.group(2))]) if m else 0.0)
+            fill = el.get("fill", "#000000")
+            rgb = [int(fill[i:i + 2], 16) for i in (1, 3, 5)]
+            edge = v[:, 0].min() <= 2 or v[:, 1].min() <= 2 or v[:, 0].max() >= cw - 2 or v[:, 1].max() >= ch - 2
+            if min(rgb) > 225 and edge:  # white page around the pictogram
+                continue
+            items.append((v, p.codes, fill))
+        allv = np.concatenate([v for v, _, _ in items])
+        _cache[name] = (items, allv.min(0), allv.max(0))
+    return _cache[name]
 
 
-def node(ax, x, y, w, h, text, fc, ec="0.45", ls="-", fs=5.6, bold=False):
-    ax.add_patch(FancyBboxPatch((x, y), w, h, boxstyle="round,pad=0.003,rounding_size=0.015", fc=fc, ec=ec, lw=0.7,
-                                ls=ls))
-    ax.text(x + w / 2, y + h / 2, text, ha="center", va="center", fontsize=fs, fontweight="bold" if bold else "normal",
-            linespacing=1.25)
+def hue(fill: str, h: float | None) -> str:
+    if h is None:
+        return fill
+    r, g, b = (int(fill[i:i + 2], 16) / 255 for i in (1, 3, 5))
+    _, l, s = colorsys.rgb_to_hls(r, g, b)
+    if s < 0.15:
+        return fill
+    r, g, b = colorsys.hls_to_rgb(h, l, s)
+    return "#%02x%02x%02x" % (int(r * 255), int(g * 255), int(b * 255))
 
 
-def link(ax, x0, y0, x1, y1, ls="-", text=None, tx=0, ty=0):
-    ax.add_patch(FancyArrowPatch((x0, y0), (x1, y1), arrowstyle="-|>", mutation_scale=7, lw=0.8, color="0.3", ls=ls,
-                                 shrinkA=0, shrinkB=0))
-    if text:
-        ax.text((x0 + x1) / 2 + tx, (y0 + y1) / 2 + ty, text, ha="center", va="center", fontsize=5.2, color="0.25")
+def icon(ax, name, x, y, w, h, z=3, shift=None, clip=None):
+    """Draw a traced pictogram fitted and centred in the box (x, y, w, h); returns the box used."""
+    items, lo, hi = _load(name)
+    span = hi - lo
+    k = min(w / span[0], h / span[1])
+    ox, oy = x + (w - span[0] * k) / 2, y + (h - span[1] * k) / 2
+    for v, codes, fill in items:
+        xy = np.column_stack([ox + (v[:, 0] - lo[0]) * k, oy + (hi[1] - v[:, 1]) * k])
+        p = PathPatch(MPath(xy, codes), facecolor=hue(fill, shift), edgecolor="none", lw=0, zorder=z)
+        ax.add_patch(p)
+        if clip is not None:
+            p.set_clip_path(clip)
+    box = (ox, oy, ox + span[0] * k, oy + span[1] * k)
+    BOXES.append((name,) + box)
+    return box
 
 
-def architecture(ax, ar):
-    """NephroSet: pretrained encoder (grey), trained modules (orange), training-only output (dashed)."""
-    ax.set_xlim(0, 1)
-    ax.set_ylim(0, 1)
-    ax.axis("off")
-    pre, trn, io = "#e6e6e6", "#fbe3d1", "#eef4fa"
-    ax.text(0.5, 0.97, "NephroSet", ha="center", va="top", fontsize=7.2, fontweight="bold")
-    # input image: 448 um crop, 112 um crop, 55 um capture spot
-    cx, cy, s = 0.075, 0.66, 0.05
-    ax.add_patch(plt.Rectangle((cx - s, cy - s * ar), 2 * s, 2 * s * ar, fc="#f2d7e3", ec="0.5", lw=0.6))
-    ax.add_patch(plt.Rectangle((cx - s / 4, cy - s * ar / 4), s / 2, s * ar / 2, fc="#e4a9c3", ec="0.3", lw=0.6))
-    ax.add_patch(Ellipse((cx, cy), s / 4, s * ar / 4, fc="none", ec="k", lw=0.7))
-    ax.text(cx, cy - s * ar - 0.03, "H&E around spot i\n448 µm and 112 µm crops", ha="center", va="top", fontsize=5.4)
-    # neighbouring spots
-    nx, ny, r = 0.075, 0.17, 0.016
-    for k in range(7):
-        a = 2 * np.pi * (k - 1) / 6
-        px, py = (nx, ny) if k == 0 else (nx + 2.1 * r * np.cos(a), ny + 2.1 * r * ar * np.sin(a))
-        ax.add_patch(Ellipse((px, py), 2 * r, 2 * r * ar, fc="#c0602a" if k == 0 else "#9ecae1", ec="white", lw=0.4))
-    ax.text(nx, ny - 3.4 * r * ar, "Six neighbouring spots j", ha="center", va="top", fontsize=5.4)
-    node(ax, 0.17, 0.40, 0.13, 0.48, "Pathology\nencoder\n(Phikon-v2)\n\npretrained,\nnot trained", pre)
-    node(ax, 0.34, 0.66, 0.13, 0.17, "196 tokens\n14 × 14 of 8 µm", io)
-    node(ax, 0.34, 0.40, 0.13, 0.19, "Crop embeddings,\nmorphology,\nimage composition", io)
-    node(ax, 0.51, 0.66, 0.14, 0.17, "Token stem +\ngated attention → $v$", trn)
-    node(ax, 0.51, 0.42, 0.14, 0.15, "Spot stem → $h^0$", trn)
-    node(ax, 0.51, 0.08, 0.14, 0.20, "Embed $h^0_j$ with\nposition $p_j - p_i$;\nmean and max", trn)
-    node(ax, 0.69, 0.30, 0.12, 0.42, "Concatenate\n[$h^0$; $v$; mean; max]\n\ntwo-layer\nnetwork", trn)
-    node(ax, 0.85, 0.52, 0.14, 0.27, "PT injury\nInflammation\nPT transport", io, bold=True)
-    node(ax, 0.85, 0.20, 0.14, 0.22, "Composition\n(9 classes)\nauxiliary output", "white", ls=(0, (3, 2)))
-    link(ax, cx + s, cy, 0.17, cy)
-    link(ax, 0.30, 0.745, 0.34, 0.745)
-    link(ax, 0.30, 0.495, 0.34, 0.495)
-    link(ax, 0.47, 0.745, 0.51, 0.745)
-    link(ax, 0.47, 0.495, 0.51, 0.495)
-    link(ax, nx + 3.2 * r, ny, 0.51, ny)
-    link(ax, 0.58, 0.42, 0.58, 0.28, text="shared stem", tx=0.045)
-    link(ax, 0.65, 0.745, 0.69, 0.62)
-    link(ax, 0.65, 0.495, 0.69, 0.51)
-    link(ax, 0.65, 0.18, 0.69, 0.38)
-    link(ax, 0.81, 0.62, 0.85, 0.655)
-    link(ax, 0.81, 0.40, 0.85, 0.31, ls=(0, (3, 2)))
-    # key
-    ky = 0.015
-    for i, (fc, ls, t) in enumerate([(pre, "-", "pretrained, not trained"), (trn, "-", "trained"),
-                                      ("white", (0, (3, 2)), "training only (supervised by\nVisium composition)")]):
-        x = 0.17 + i * 0.2
-        ax.add_patch(FancyBboxPatch((x, ky), 0.025, 0.045, boxstyle="round,pad=0.002", fc=fc, ec="0.45", lw=0.6, ls=ls))
-        ax.text(x + 0.032, ky + 0.0225, t, ha="left", va="center", fontsize=5.2)
-    ax.text(0.92, 0.88, "Supervision: same-section\nVisium programme scores", ha="center", va="center", fontsize=5.2,
-            color="0.25")
+# ------------------------------------------------------------------ primitives
+def text(ax, x, y, s, size=6.2, weight="normal", color=INK, ha="center", va="center", style="normal", track=True):
+    t = ax.text(x, y, s, fontsize=size, fontweight=weight, color=color, ha=ha, va=va, style=style, zorder=8,
+                linespacing=1.15)
+    if track:
+        TEXTS.append(t)
+    return t
+
+
+def frame(ax, x0, y0, x1, y1, fc, ec="#BDBDBD", lw=0.6, ls="-", r=2.0, z=1):
+    ax.add_patch(FancyBboxPatch((x0, y0), x1 - x0, y1 - y0, boxstyle=f"round,pad=0,rounding_size={r}", fc=fc,
+                                ec=ec, lw=lw, ls=ls, zorder=z))
+
+
+def arrow(ax, x0, y0, x1, y1, color=LINE, lw=0.9, ls="-", rad=0.0):
+    ax.add_patch(FancyArrowPatch((x0, y0), (x1, y1), arrowstyle="-|>", mutation_scale=7, lw=lw, color=color,
+                                 ls=ls, connectionstyle=f"arc3,rad={rad}", shrinkA=0, shrinkB=0, zorder=6))
+
+
+def vector(ax, x, y, n, color, cell=1.6, vertical=False):
+    """A feature vector drawn as a strip of shaded cells; returns its far edge."""
+    rng = np.random.default_rng(n * 7 + len(color))
+    for i in range(n):
+        a = 0.35 + 0.6 * rng.random()
+        xy = (x, y + i * cell) if vertical else (x + i * cell, y)
+        ax.add_patch(Rectangle(xy, cell, cell, fc=color, alpha=a, ec="white", lw=0.3, zorder=5))
+    return (y + n * cell) if vertical else (x + n * cell)
+
+
+def lattice(ax, cx, cy, r, centre, ring, gap=2.25):
+    """The centre spot and its six Visium neighbours."""
+    pts = [(cx, cy)] + [(cx + gap * r * np.cos(a), cy + gap * r * np.sin(a)) for a in np.arange(6) * np.pi / 3]
+    for i, (x, y) in enumerate(pts):
+        ax.add_patch(Circle((x, y), r, fc=centre if i == 0 else ring, ec="white", lw=0.5, zorder=5))
+    return pts
+
+
+# ------------------------------------------------------------------ panel a
+def token_grid(ax, x, y, s):
+    """112 µm crop with its 14 x 14 tokens, the 55 µm capture spot and a schematic attention map."""
+    clip = Rectangle((x, y), s, s, transform=ax.transData)
+    icon(ax, "histology", x - s * 0.02, y - s * 0.02, s * 1.04, s * 1.04, z=3, clip=clip)
+    BOXES.pop()
+    n, c = 14, s / 14
+    yy, xx = np.mgrid[0:n, 0:n] + 0.5
+    att = np.exp(-((xx - 7) ** 2 + (yy - 7) ** 2) / 14.0) * (0.6 + 0.4 * np.random.default_rng(3).random((n, n)))
+    att /= att.max()
+    for i in range(n):
+        for j in range(n):
+            ax.add_patch(Rectangle((x + j * c, y + i * c), c, c, fc="#E8590C", alpha=0.5 * att[i, j] ** 1.5,
+                                   ec="white", lw=0.25, zorder=4))
+    ax.add_patch(Circle((x + s / 2, y + s / 2), s * 55 / 112 / 2, fc="none", ec=INK, lw=0.8, ls=(0, (2, 1)), zorder=5))
+    ax.add_patch(Rectangle((x, y), s, s, fc="none", ec=INK, lw=0.6, zorder=5))
+
+
+def panel_a(ax, nums):
+    top = 146.0
+    frame(ax, 1.0, 50.0, 179.0, top + 1.5, "white", ec="#CFCFCF")
+    text(ax, 90, top - 3.0, "NephroSet", size=8, weight="bold")
+    # input
+    icon(ax, "slide", 4, 112, 30, 18)
+    text(ax, 19, 109.5, "H&E section")
+    hx, hy, hs = 8.5, 78.5, 22
+    icon(ax, "histology", hx, hy, hs, hs)
+    ax.add_patch(Circle((hx + hs / 2, hy + hs / 2), hs * 55 / 112 / 2, fc="none", ec=INK, lw=0.8, ls=(0, (2, 1)),
+                        zorder=6))
+    arrow(ax, 19, 106.8, 19, 101.4, lw=0.7)
+    text(ax, 19.5, 74.5, "Crops of 112 and 448 µm\naround each spot")
+    # pretrained encoder
+    frame(ax, 39, 72, 61, 124, GREY, ec="#9E9E9E")
+    icon(ax, "encoder", 41.5, 93, 17, 22)
+    text(ax, 50, 88.5, "Pathology\nencoder", weight="bold")
+    text(ax, 50, 79.5, "pretrained,\nnot trained", size=5.6, color=SOFT)
+    arrow(ax, 31.5, 89.5, 39, 89.5)
+    # branch 1: tokens + gated attention
+    frame(ax, 67, 106, 121, 141, ORANGE, ec="#D9A47F")
+    token_grid(ax, 69.5, 109, 26)
+    text(ax, 108.5, 132.5, "196 tokens\nof 8 µm", weight="bold")
+    text(ax, 108.5, 123.0, "gated attention\nselects tokens", size=5.6, color=SOFT)
+    vend = vector(ax, 101.5, 112.0, 8, "#E8590C")
+    text(ax, vend + 1.6, 112.8, r"$v$", size=7, ha="left")
+    arrow(ax, 61, 112, 67, 120)
+    # branch 2: spot embedding
+    frame(ax, 67, 86, 121, 101, ORANGE, ec="#D9A47F")
+    text(ax, 69.5, 96.8, "Spot embedding", weight="bold", ha="left")
+    text(ax, 69.5, 91.2, "crop embeddings, morphology,\nimage composition", size=5.6, color=SOFT, ha="left")
+    vend = vector(ax, 102.0, 92.2, 8, "#C0602A")
+    text(ax, vend + 1.2, 93.0, r"$h^{0}$", size=7, ha="left")
+    arrow(ax, 61, 93.5, 67, 93.5)
+    # branch 3: neighbourhood set
+    frame(ax, 67, 52.5, 121, 81, ORANGE, ec="#D9A47F")
+    text(ax, 69.5, 76.5, "Neighbourhood set", weight="bold", ha="left")
+    text(ax, 69.5, 70.6, "each neighbour: embedding\nand relative position", size=5.6, color=SOFT, ha="left")
+    pts = lattice(ax, 80.5, 60.5, 2.5, "#C0602A", "#9EC9E2")
+    for (px, py) in pts[1:]:
+        ax.plot([80.5, px], [60.5, py], color="#7FA9C4", lw=0.5, zorder=4)
+    text(ax, 103.5, 63.5, "mean and max\n(order-free)", size=5.6, color=SOFT)
+    vector(ax, 96.5, 56.0, 8, "#2B7BBA")
+    arrow(ax, 61, 80, 67, 72)
+    arrow(ax, 94, 86, 94, 81, lw=0.7)
+    text(ax, 95.5, 83.5, "same stem for neighbours", size=5.2, color=SOFT, ha="left")
+    BOXES.append(("lattice", 72.0, 52.5, 89.0, 68.5))
+    # fusion network
+    frame(ax, 127, 72, 147, 124, ORANGE, ec="#D9A47F")
+    icon(ax, "network", 129.5, 98, 15, 17)
+    text(ax, 137, 90.0, "Fusion\nnetwork", weight="bold")
+    text(ax, 137, 79.5, "concatenate,\ntwo layers", size=5.6, color=SOFT)
+    arrow(ax, 121, 123.5, 127, 112)
+    arrow(ax, 121, 93.5, 127, 93.5)
+    arrow(ax, 121, 66.5, 127, 78)
+    # outputs
+    for k, (lab, h, y) in enumerate([("PT injury", None, 120.0), ("Inflammation", 0.83, 105.0),
+                                     ("PT transport", 0.58, 90.0)]):
+        icon(ax, "map", 151.5, y, 26, 10.5, shift=h)
+        text(ax, 164.5, y + 12.8, lab, size=6.0, weight="bold")
+        arrow(ax, 147, 98, 151.3, y + 5.0, lw=0.7)
+    text(ax, 164.5, 140.0, "Programme maps", size=6.4, weight="bold")
+    frame(ax, 151, 68.5, 177, 83, "white", ec="#9E9E9E", ls=(0, (3, 2)))
+    ax.add_patch(Wedge((157.0, 75.8), 3.6, 0, 140, fc="#9EC9E2", ec="white", lw=0.4, zorder=5))
+    ax.add_patch(Wedge((157.0, 75.8), 3.6, 140, 250, fc="#F2B880", ec="white", lw=0.4, zorder=5))
+    ax.add_patch(Wedge((157.0, 75.8), 3.6, 250, 360, fc="#B9DDB0", ec="white", lw=0.4, zorder=5))
+    text(ax, 169.0, 75.8, "Cell-class\ncomposition\n(training only)", size=5.4, color=SOFT)
+    arrow(ax, 147, 78, 151, 76, lw=0.7, ls=(0, (3, 2)))
+    # supervision and inference
+    icon(ax, "rna", 129, 54.5, 11, 9)
+    text(ax, 141.5, 59.0, "Training: same-section\nVisium programme scores", size=5.6, ha="left", color=SOFT)
+    frame(ax, 4, 54, 35, 67, BLUE, ec="#9DB9D3")
+    text(ax, 19.5, 60.5, "At inference: H&E image\nand spot coordinates only", size=5.6)
+    # legend
+    for i, (fc, ec, lab) in enumerate([(GREY, "#9E9E9E", "pretrained"), (ORANGE, "#D9A47F", "trained")]):
+        lx = 4 + i * 20
+        frame(ax, lx, 140.5, lx + 4, 143.5, fc, ec=ec, r=0.6)
+        text(ax, lx + 5, 142.0, lab, size=5.6, ha="left")
+
+
+# ------------------------------------------------------------------ panel b
+def panel_b(ax, nums):
+    frame(ax, 1.0, 13.0, 179.0, 45.5, "white", ec="#CFCFCF")
+    steps = [
+        ("cells", "Design rationale", f"{nums['pt_targets']:,} PT cells\n{nums['atlas_donors']} donors\n"
+                                      "single-cell atlas"),
+        ("cohort", "Development", f"{nums['kpmp_participants']} KPMP participants\n{nums['kpmp_spots']:,} "
+                                  "spots\nheld-out participants"),
+        (None, "Design tests", "same encoder:\nscale, pooling, context\n3 published methods"),
+        ("hospital", "Second centre", f"{nums['ext_donors']} donors\n{nums['ext_spots']:,} spots\n"
+                                      "model unchanged"),
+    ]
+    cw = 178.0 / 4
+    for i, (ic, head, body) in enumerate(steps):
+        x0 = 1.0 + i * cw
+        cx = x0 + cw / 2
+        if ic:
+            icon(ax, ic, x0 + 3.0, 15.5, 17.0, 23.0)
+        else:
+            bars = [0.0, 0.009, 0.033, 0.036, 0.040]
+            cols = ["#9E9E9E", "#9EC9E2", "#F2B880", "#E8590C", "#C0602A"]
+            for j, (b, c) in enumerate(zip(bars, cols)):
+                ax.add_patch(Rectangle((x0 + 5.0 + j * 3.0, 18.0), 2.3, 2.0 + b * 420, fc=c, ec="none", zorder=4))
+            ax.plot([x0 + 4.0, x0 + 20.5], [18.0, 18.0], color=INK, lw=0.6, zorder=5)
+        text(ax, x0 + 21.5 + (cw - 23.0) / 2, 37.0, head, size=6.6, weight="bold")
+        text(ax, x0 + 21.5 + (cw - 23.0) / 2, 26.0, body, size=5.7, color=SOFT)
+        if i < 3:
+            arrow(ax, x0 + cw - 1.6, 27.0, x0 + cw + 1.6, 27.0, lw=1.2)
+
+
+# ------------------------------------------------------------------ checks and output
+def overlaps(fig, ax) -> list[str]:
+    fig.canvas.draw()
+    rnd = fig.canvas.get_renderer()
+    inv = ax.transData.inverted()
+    boxes = []
+    for t in TEXTS:
+        bb = t.get_window_extent(rnd)
+        (a, b), (c, d) = inv.transform([[bb.x0, bb.y0], [bb.x1, bb.y1]])
+        boxes.append((t.get_text().replace("\n", " "), a, b, c, d))
+    bad = []
+    for i, p in enumerate(boxes):
+        for q in boxes[i + 1:]:
+            if min(p[3], q[3]) - max(p[1], q[1]) > 0.1 and min(p[4], q[4]) - max(p[2], q[2]) > 0.1:
+                bad.append(f"text/text: {p[0]!r} x {q[0]!r}")
+        for name, x0, y0, x1, y1 in BOXES:
+            if min(p[3], x1) - max(p[1], x0) > 0.3 and min(p[4], y1) - max(p[2], y0) > 0.3:
+                bad.append(f"text/icon: {p[0]!r} x {name}")
+        if p[1] < 1.5 or p[3] > W - 1.5 or p[2] < Y0 + 1.5 or p[4] > H - 0.5:
+            bad.append(f"outside the figure: {p[0]!r}")
+    return bad
 
 
 def main() -> None:
@@ -110,95 +277,26 @@ def main() -> None:
     kp = pd.read_csv(R / "11b_kpmp_targets" / "spot_summary.tsv", sep="\t")
     kp = kp[kp.status == "ok"]
     ex = pd.read_csv(R / "13_gse211785_prep" / "sections.tsv", sep="\t")
-    nums = dict(atlas_sections=len(atlas), atlas_donors=atlas.donor.nunique(), atlas_cells=int(atlas.n_cells.sum()),
-                pt_targets=int(tg.n_targets.sum()), kpmp_participants=len(kp), kpmp_spots=int(kp.n_spots.sum()),
-                ext_donors=len(ex), ext_spots=int(ex.n_spots.sum()))
-
-    H = 6.3
-    fig = plt.figure(figsize=(W2, H))
-    global AR
-    AR = W2 / 3.3
-    arch = fig.add_axes([0, 3.62 / H, 1, 2.55 / H])
-    architecture(arch, W2 / 2.55)
-    label(arch, "a")
-    ax = fig.add_axes([0, 0, 1, 3.3 / H])
-    label(ax, "b")
-    ax.set_xlim(0, 1)
-    ax.set_ylim(0, 1)
+    used = atlas[atlas["sample"].isin(tg["sample"])]
+    nums = dict(atlas_sections=len(used), atlas_donors=used.donor.nunique(), pt_targets=int(tg.n_targets.sum()),
+                kpmp_participants=len(kp), kpmp_spots=int(kp.n_spots.sum()), ext_donors=len(ex),
+                ext_spots=int(ex.n_spots.sum()))
+    fig = plt.figure(figsize=(W / 25.4, (H - Y0) / 25.4))
+    ax = fig.add_axes([0, 0, 1, 1])
+    ax.set_xlim(0, W)
+    ax.set_ylim(Y0, H)
+    ax.set_aspect("equal")
     ax.axis("off")
-    blue, green, orange, grey = "#2c6e9b", "#2e8b57", "#c0602a", "#5a5a5a"
-    # data column
-    box(ax, 0.01, 0.53, 0.22, 0.44, "Public data", [
-        "CosMx / Xenium kidney atlas",
-        f"  {nums['atlas_sections']} sections, {nums['atlas_donors']} donors",
-        f"  {nums['atlas_cells'] / 1e6:.2f} M cells",
-        "KPMP Visium + same-section H&E",
-        f"  {nums['kpmp_participants']} participants",
-        f"  {nums['kpmp_spots']:,} spots",
-    ], "#eef4fa", blue)
-    box(ax, 0.01, 0.05, 0.22, 0.42, "Independent centre", [
-        "GSE211785 Visium + H&E",
-        f"  {nums['ext_donors']} donors, {nums['ext_spots']:,} spots",
-        "  nephrectomy tissue",
-        "Models applied unchanged;",
-        "  measurements used only to evaluate",
-    ], "#f3f3f3", grey)
-    # question 1
-    box(ax, 0.27, 0.53, 0.33, 0.44, "1  Design rationale (single cell)", [
-        f"{nums['pt_targets']:,} proximal tubule (PT) cells",
-        "Target: PT injury, inflammation, transport",
-        "A  composition around the cell",
-        "B  + pairwise distances to each class",
-        "C  + local co-occurrence of classes",
-        "D  + tubular unit and its halo",
-        "Donor-held-out; permuted-label null",
-    ], "#eef7f1", green, step=0.047)
-    # cell sketch for question 1
-    rng = np.random.default_rng(3)
-    cx, cy = 0.545, 0.64
-    for k in range(10):
-        a = 2 * np.pi * k / 10
-        ax.add_patch(Ellipse((cx + 0.026 * np.cos(a), cy + 0.052 * np.sin(a)), 0.012, 0.012 * AR, fc="#9ecae1", ec="none"))
-    for col, n in [("#de2d26", 3), ("#31a354", 3), ("#e6550d", 2)]:
-        for _ in range(n):
-            a = rng.uniform(0, 2 * np.pi)
-            ax.add_patch(Ellipse((cx + 0.045 * np.cos(a), cy + 0.09 * np.sin(a)), 0.010, 0.010 * AR, fc=col, ec="none"))
-    # question 2
-    box(ax, 0.27, 0.05, 0.33, 0.42, "2  NephroSet", [
-        "H&E crops 112 µm and 448 µm per spot",
-        "Phikon-v2 pathology encoder",
-        "Fine scale: 8 µm tokens, gated attention",
-        "Context: neighbouring spots as a set",
-        "No segmentation, no anatomical prior",
-        "Supervision: same-section Visium",
-        "Output: 3 programmes + composition",
-    ], "#fdf3ec", orange, step=0.043)
-    hexes(ax, 0.545, 0.14, 0.017, [0.2, 0.7, 0.4, 0.9, 0.3, 0.6, 0.8], plt.cm.YlOrRd)
-    # evaluation
-    box(ax, 0.64, 0.05, 0.35, 0.92, "Evaluation", [
-        "Participant-held-out cross-validation:",
-        "  within-section agreement",
-        "  beyond measured composition",
-        "  PT-rich spots; ~400 µm regions",
-        "  split-half reliability reference",
-        "Design tests (same encoder):",
-        "  context between spots",
-        "  token mean, graph, hypergraph",
-        "  capture area vs crop edge",
-        "Published methods:",
-        "  iStar, BLEEP, Hist2ST",
-        "Second centre:",
-        "  model applied unchanged",
-        "Confidence:",
-        "  ensemble disagreement, image novelty",
-        "  calibrated 90% intervals",
-    ], "#f7f2fa", "#6a3d9a", step=0.048)
-    arrow(ax, 0.23, 0.75, 0.27, 0.75)
-    arrow(ax, 0.23, 0.70, 0.27, 0.30)
-    arrow(ax, 0.23, 0.26, 0.27, 0.26)
-    arrow(ax, 0.60, 0.75, 0.64, 0.75)
-    arrow(ax, 0.60, 0.26, 0.64, 0.26)
+    panel_a(ax, nums)
+    panel_b(ax, nums)
+    for letter, y in (("a", H - 1.0), ("b", 47.0)):
+        ax.text(0.0, y, letter, fontsize=9, fontweight="bold", ha="left", va="top" if letter == "a" else "bottom")
+    bad = overlaps(fig, ax)
+    for b in bad:
+        print("OVERLAP", b, file=sys.stderr)
     save(fig, "Fig1", {"numbers": pd.DataFrame([nums])}, check=False)
+    if bad:
+        sys.exit(1)
 
 
 if __name__ == "__main__":
