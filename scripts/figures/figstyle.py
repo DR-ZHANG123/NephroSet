@@ -19,7 +19,7 @@ SRC = FIG / "source_data"
 SRC.mkdir(parents=True, exist_ok=True)
 
 MM = 1 / 25.4
-W1, W2 = 85 * MM, 170 * MM          # BMC single and double column widths
+W1, W2 = 85 * MM, 170 * MM          # single and double column widths
 
 mpl.rcParams.update({
     "font.family": "sans-serif", "font.sans-serif": ["Arial", "Liberation Sans", "DejaVu Sans"],
