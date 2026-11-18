@@ -73,9 +73,13 @@ def generate(name: str, key: str) -> str:
     return prompt
 
 
+COARSE = {"histology", "cells", "slide", "cohort"}  # textured pictograms: coarser trace keeps files small
+
+
 def trace(name: str) -> None:
     import vtracer
-    vtracer.convert_image_to_svg_py(str(OUT / f"{name}.png"), str(OUT / f"{name}.svg"), **TRACE)
+    opts = dict(TRACE, filter_speckle=14, color_precision=5, layer_difference=28) if name in COARSE else TRACE
+    vtracer.convert_image_to_svg_py(str(OUT / f"{name}.png"), str(OUT / f"{name}.svg"), **opts)
 
 
 def main() -> None:
