@@ -131,7 +131,7 @@ def main() -> None:
         cls = np.where(tis, z["cls"][i], np.nan).astype(float)
         a0 = fig.add_subplot(eg[0, i])
         a0.imshow(img)
-        a0.set_title(f"P{i // 2 + 1}, {r.injury_group} injury\n({ordinal(round(r.y_pt_injury_pct))} pct)", pad=2,
+        a0.set_title(f"P{i // 2 + 1}, {r.injury_group} injury\n({'lowest' if r.injury_group == 'low' else 'highest'} tenth)", pad=2,
                      fontsize=5.6)
         a1 = fig.add_subplot(eg[1, i])
         a1.imshow(img)

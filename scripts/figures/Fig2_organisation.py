@@ -4,7 +4,8 @@ from __future__ import annotations
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from matplotlib.patches import Patch
+from matplotlib.legend_handler import HandlerPatch
+from matplotlib.patches import Circle, Patch
 from matplotlib.lines import Line2D
 
 from figstyle import PAL, ROOT, W2, label, save
@@ -52,10 +53,12 @@ def main() -> None:
     handles = [Line2D([], [], marker="o", ls="", ms=3.5, mfc=CLASS_COL[c], mec="none", label=CLASS_LAB[c])
                for c in ["PT", "Endothelial", "Fibroblast", "Immune", "Mural", "DCT_CNT", "Glomerular"]]
     handles += [Line2D([], [], marker="o", ls="", ms=4, mfc="none", mec=PAL["dark"], label="Unit member"),
-                Line2D([], [], marker="o", ls="", ms=5, mfc="none", mec="k", label="Halo cell"),
+                Circle((0, 0), 1, fill=False, ec="k", lw=0.8, ls=(0, (1, 1)), label="Halo cell"),
                 Line2D([], [], marker="*", ls="", ms=6, mfc="k", mec="none", label="Index PT cell")]
+    ring = HandlerPatch(patch_func=lambda legend, orig_handle, xdescent, ydescent, width, height, fontsize:
+                        Circle((width / 2 - xdescent, height / 2 - ydescent), height * 0.55))
     ax.legend(handles=handles, ncol=2, loc="upper center", bbox_to_anchor=(0.5, -0.02), fontsize=5.5,
-              handletextpad=0.2, columnspacing=0.6)
+              handletextpad=0.2, columnspacing=0.6, handler_map={Circle: ring})
     label(ax, "a")
 
     # b: performance across nested descriptor sets (observed labels)

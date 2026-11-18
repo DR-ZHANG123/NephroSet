@@ -43,8 +43,8 @@ def fig_s1():
     fig.legend(handles=[Line2D([], [], marker="o", ls="", ms=3, color=PAL["anatomy"], label="Observed labels"),
                         Line2D([], [], marker="s", ls="", ms=3, mfc="white", color=PAL["null"],
                                label="Interstitial labels permuted within 100 µm")],
-               loc="lower right", fontsize=5.5, ncol=2, frameon=False, bbox_to_anchor=(0.99, -0.02))
-    fig.subplots_adjust(wspace=0.35, left=0.09, right=0.99, bottom=0.3, top=0.85)
+               loc="upper right", fontsize=5.5, ncol=2, frameon=False, bbox_to_anchor=(0.99, 1.0))
+    fig.subplots_adjust(wspace=0.35, left=0.09, right=0.99, bottom=0.3, top=0.8)
     save(fig, "FigS1", {"levels": pd.DataFrame(rows)})
 
 

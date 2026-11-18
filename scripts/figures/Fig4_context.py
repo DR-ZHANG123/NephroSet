@@ -52,7 +52,7 @@ def forest(ax, pm, items, ref, rng, metric="rho"):
 def supplementary_forests(pm, rng) -> None:
     """Supplementary figure: every model with context between spots, within the spot, and other hyperedges."""
     fig = plt.figure(figsize=(W2, 3.1))
-    gs = fig.add_gridspec(1, 3, wspace=1.25, left=0.14, right=0.96, top=0.84, bottom=0.2)
+    gs = fig.add_gridspec(1, 3, wspace=1.3, left=0.14, right=0.93, top=0.84, bottom=0.2)
     out = {}
     for j, (items, ref, xlab, title, xl, key) in enumerate([
             (BETWEEN, "mlp", "Δ ρ vs spot only", "Context between spots", (-0.03, 0.05), "a_between"),
@@ -61,7 +61,7 @@ def supplementary_forests(pm, rng) -> None:
              "c_hyperedges")]):
         ax = fig.add_subplot(gs[j])
         out[key] = pd.DataFrame(forest(ax, pm, items, ref, rng))
-        ax.set_xlabel(xlab + "\n(95% CI, 201 participants)")
+        ax.set_xlabel(xlab + ("\n(95% CI, 201 participants)" if j < 2 else "\n(95% CI)"))
         ax.set_title(title, pad=3)
         ax.set_xlim(*xl)
         ax.tick_params(axis="y", labelsize=5.6)

@@ -154,9 +154,10 @@ def region_panel(ax, sch):
 BUBBLE = [("mlp", "Spot only"), ("deepsets", "Neighbourhood set"), ("tok_mean", "Token mean"),
           ("tok_abmil", "Token attention"), ("tok_gat", "Token graph"), ("tok_hyper_anat", "Anatomical token\nhypergraph"),
           ("tok_hyper_anat_ctx", "Anatomical token\nhypergraph + set"), ("tok_abmil_ctx", "NephroSet")]
-BOFF = {"mlp": (8, 0, "left"), "deepsets": (8, 0, "left"), "tok_mean": (-8, 3, "right"), "tok_abmil": (10, -14, "left"),
-        "tok_gat": (11, -2, "left"), "tok_hyper_anat": (8, -19, "left"), "tok_hyper_anat_ctx": (-4, 15, "right"),
+BOFF = {"mlp": (8, 0, "left"), "deepsets": (8, 0, "left"), "tok_mean": (-8, 3, "right"),
         "tok_abmil_ctx": (-9, 8, "right")}
+LEAD = {"tok_abmil": (2.6, 0.2505), "tok_hyper_anat": (9.5, 0.2415), "tok_hyper_anat_ctx": (1.3, 0.2735),
+        "tok_gat": (13.0, 0.2700)}  # label positions (data units) joined to their bubbles by a leader line
 
 
 def bubble_panel(ax):
@@ -171,18 +172,23 @@ def bubble_panel(ax):
         fam = PAL["anatomy"] if nep else ("#5B5B5B" if m.startswith("tok") else "#A9A9A9")
         ax.scatter(x, y, s=12 + 7 * ms, color=fam, alpha=0.9 if nep else 0.55, ec="k" if nep else "white", lw=0.6,
                    zorder=4 if nep else 3)
-        dx, dy, ha = BOFF[m]
-        ax.annotate(lab, (x, y), xytext=(dx, dy), textcoords="offset points", fontsize=5.2, ha=ha, va="center",
-                    color=fam if nep else "0.2", fontweight="bold" if nep else "normal")
+        if m in LEAD:
+            ax.annotate(lab, (x, y), xytext=LEAD[m],
+                        textcoords="data", fontsize=5.2, ha="left" if LEAD[m][0] > x else "right", va="center",
+                        color="0.2", arrowprops=dict(arrowstyle="-", lw=0.4, color="0.45", shrinkA=1, shrinkB=3))
+        else:
+            dx, dy, ha = BOFF[m]
+            ax.annotate(lab, (x, y), xytext=(dx, dy), textcoords="offset points", fontsize=5.2, ha=ha, va="center",
+                        color=fam if nep else "0.2", fontweight="bold" if nep else "normal")
         rows.append(dict(model=m, train_min=x, inference_ms=ms, rho=y, parameters_m=cost.loc[m, "parameters"] / 1e6))
     ax.set_xscale("log")
-    ax.set_xlim(0.04, 30)
+    ax.set_xlim(0.04, 60)
     ax.set_ylim(0.212, 0.278)
     ax.set_xlabel("Estimated training compute (min per model)")
     ax.set_ylabel("PT injury ρ (held out)")
     ax.set_title("Accuracy and cost", pad=3)
-    for ms, xx in ((1, 6.0), (10, 10.5), (30, 19.0)):
+    for ms, xx in ((1, 9.0), (10, 17.0), (30, 32.0)):
         ax.scatter(xx, 0.2185, s=12 + 7 * ms, color="0.75", ec="white", lw=0.5)
         ax.text(xx, 0.2135, f"{ms}", fontsize=4.8, ha="center", va="center")
-    ax.text(10.5, 0.2245, "inference, ms per section", fontsize=4.8, ha="center")
+    ax.text(17.0, 0.2245, "inference, ms per section", fontsize=4.8, ha="center")
     return pd.DataFrame(rows)
