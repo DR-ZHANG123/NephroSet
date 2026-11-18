@@ -55,48 +55,48 @@ def main() -> None:
     (S / "table2_rows.tex").write_text("\n".join(tex) + "\n")
     # Additional file 2 workbook
     sheets = {
-        "Table S2 participants": pd.read_csv(p("results/10_kpmp_index/sections.tsv"), sep="\t")
+        "Table S3 participants": pd.read_csv(p("results/10_kpmp_index/sections.tsv"), sep="\t")
         .merge(pd.read_csv(p("results/11b_kpmp_targets/spot_summary.tsv"), sep="\t"), on="section", how="left",
                suffixes=("", "_spots")),
-        "Table S3 single-cell": pd.read_csv(p("results/03_atlas_increment/model_performance.tsv"), sep="\t"),
-        "Table S3b increments": pd.read_csv(p("results/03_atlas_increment/increments.tsv"), sep="\t"),
-        "Table S4 CV summary": cv,
-        "Table S5 CV contrasts": pd.read_csv(p("results/16_evaluate_cv/contrasts.tsv"), sep="\t"),
-        "Table S5b scale": pd.read_csv(p("results/16c_scale_diagnostics/spot_mixing.tsv"), sep="\t"),
-        "Table S5c token roles": pd.read_csv(p("results/16c_scale_diagnostics/token_roles_heldout.tsv"), sep="\t")
+        "Table S4 single-cell": pd.read_csv(p("results/03_atlas_increment/model_performance.tsv"), sep="\t"),
+        "Table S4b increments": pd.read_csv(p("results/03_atlas_increment/increments.tsv"), sep="\t"),
+        "Table S5 CV summary": cv,
+        "Table S6 CV contrasts": pd.read_csv(p("results/16_evaluate_cv/contrasts.tsv"), sep="\t"),
+        "Table S6b scale": pd.read_csv(p("results/16c_scale_diagnostics/spot_mixing.tsv"), sep="\t"),
+        "Table S6c token roles": pd.read_csv(p("results/16c_scale_diagnostics/token_roles_heldout.tsv"), sep="\t")
         .groupby(["cls"]).r.agg(["mean", "std", "count"]).reset_index(),
-        "Table S5d token regions tissue": pd.read_csv(p("results/16h_region_tissue/contrasts.tsv"), sep="\t")
+        "Table S6d token regions tissue": pd.read_csv(p("results/16h_region_tissue/contrasts.tsv"), sep="\t")
         .assign(mean_tissue_tokens_inside=lambda d: pd.read_csv(p("results/16h_region_tissue/tissue_tokens.tsv"), sep="\t")
                 .mean_tissue_tokens_inside.mean(),
                 mean_tissue_tokens_outermost=lambda d: pd.read_csv(p("results/16h_region_tissue/tissue_tokens.tsv"), sep="\t")
                 .mean_tissue_tokens_outermost.mean()),
-        "Table S6 external": ex,
-        "Table S6b external contrasts": pd.read_csv(p("results/18_evaluate_external/contrasts.tsv"), sep="\t"),
-        "Table S6c external tissue": pd.read_csv(p("results/18e_external_tissue/summary.tsv"), sep="\t")
+        "Table S7 external": ex,
+        "Table S7b external contrasts": pd.read_csv(p("results/18_evaluate_external/contrasts.tsv"), sep="\t"),
+        "Table S7c external tissue": pd.read_csv(p("results/18e_external_tissue/summary.tsv"), sep="\t")
         .merge(pd.read_csv(p("results/18e_external_tissue/spots_kept.tsv"), sep="\t"), on="filter"),
-        "Table S7 reliability regions": pd.concat([
+        "Table S8 reliability regions": pd.concat([
             pd.read_csv(p("results/16b_reliability_region/summary.tsv"), sep="\t").assign(cohort="KPMP"),
             pd.read_csv(p("results/18b_external_reliability/ceiling.tsv"), sep="\t").assign(cohort="External ceiling"),
             pd.read_csv(p("results/18c_external_region_coverage/region_summary.tsv"), sep="\t").assign(cohort="External")]),
-        "Table S8 subgroups coverage": pd.concat([
+        "Table S9 subgroups coverage": pd.concat([
             pd.read_csv(p("results/20_subgroups/subgroups.tsv"), sep="\t"),
             pd.read_csv(p("results/18c_external_region_coverage/coverage.tsv"), sep="\t").assign(grouping="coverage"),
             pd.read_csv(p("results/17_confidence/conformal_cv.tsv"), sep="\t").assign(grouping="coverage KPMP folds"),
             pd.read_csv(p("results/18c_external_region_coverage/coverage_sections.tsv"), sep="\t")
             .assign(grouping="coverage per external donor")]),
-        "Table S9 composition models": pd.read_csv(p("results/16f_adjustment_sensitivity/summary.tsv"), sep="\t"),
-        "Table S9b composition contrasts": pd.read_csv(p("results/16f_adjustment_sensitivity/contrasts.tsv"), sep="\t"),
-        "Table S10 reliability": pd.read_csv(p("results/16g_reliability_sensitivity/summary.tsv"), sep="\t"),
-        "Table S11 external donors": pd.read_csv(p("results/18d_external_donors/donor_metrics.tsv"), sep="\t"),
-        "Table S11b seeds": pd.read_csv(p("results/18d_external_donors/seed_stability.tsv"), sep="\t"),
+        "Table S10 composition models": pd.read_csv(p("results/16f_adjustment_sensitivity/summary.tsv"), sep="\t"),
+        "Table S10b composition contrasts": pd.read_csv(p("results/16f_adjustment_sensitivity/contrasts.tsv"), sep="\t"),
+        "Table S11 reliability": pd.read_csv(p("results/16g_reliability_sensitivity/summary.tsv"), sep="\t"),
+        "Table S12 external donors": pd.read_csv(p("results/18d_external_donors/donor_metrics.tsv"), sep="\t"),
+        "Table S12b seeds": pd.read_csv(p("results/18d_external_donors/seed_stability.tsv"), sep="\t"),
     }
     cost = p("results/21b_model_cost/model_cost.tsv")
     if cost.exists():
-        sheets["Table S12 model cost"] = pd.read_csv(cost, sep="\t")
+        sheets["Table S13 model cost"] = pd.read_csv(cost, sep="\t")
     keep = ["participant", "section", "status", "n_spots_tissue", "frac_spots_on_tissue", "um_per_px",
             "enrollment_category", "primary_adjudicated_category", "sample_type", "tissue_source", "age_binned", "sex",
             "baseline_egfr", "diabetes_history", "hypertension_history", "n_spots_spots", "median_umi"]
-    sheets["Table S2 participants"] = sheets["Table S2 participants"][[c for c in keep if c in sheets["Table S2 participants"]]]
+    sheets["Table S3 participants"] = sheets["Table S3 participants"][[c for c in keep if c in sheets["Table S3 participants"]]]
     out = S / "Additional_file_2.xlsx"
     with pd.ExcelWriter(out) as w:
         readme = pd.DataFrame({"sheet": list(sheets), "content": [
@@ -120,7 +120,7 @@ def main() -> None:
             "Second centre: donor-mean agreement of single seeds and of seed ensembles, including a repeated training run of NephroSet",
             "Trainable parameters, inference time and training cost of each model"][:len(sheets)]})
         # number the sheets in the order in which the tables are first cited in the text
-        renum = {4: 6, 5: 7, 6: 9, 7: 10, 8: 12, 9: 5, 10: 4, 11: 11, 12: 8}
+        renum = {5: 7, 6: 8, 7: 10, 8: 11, 9: 13, 10: 6, 11: 5, 13: 9}  # internal key -> number of first citation
 
         def new_key(k):
             m = re.match(r"Table S(\d+)(.*)", k)
