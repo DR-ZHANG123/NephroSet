@@ -22,7 +22,7 @@ to the tokens inside the 55 µm capture spot, around it or at the edge of the cr
     of BLEEP and iStar to the shared image encoder).
   - `16`–`21`: evaluation, split-half reliability (with alternative definitions), alternative composition
     adjustments, token attention, confidence, results by external donor and seed, external tissue coverage and
-    donor overlap (`18e`), tissue coverage of token regions (`16h`), subgroups, tables and model cost.
+    donor overlap (`18e`), tissue coverage of token regions (`16h`), participant burden against eGFR and albuminuria (`16i`), subgroups, tables and model cost.
   - External results use the ensemble of the same three seeds as cross-validation; ten seeds are trained to
     assess stability. Training on GPUs is not bit-reproducible, so repeated runs give slightly different models.
   - Prediction intervals are calibrated on validation participants that were not used to fit the model weights.
